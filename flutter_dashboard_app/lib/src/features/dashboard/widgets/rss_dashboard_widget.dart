@@ -59,53 +59,59 @@ class _RssDashboardWidgetState extends State<RssDashboardWidget> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2.0,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    'RSS: ${widget.config.feedSourceName}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis,
+      child: InkWell( // Added InkWell for general tap feedback if desired on the whole card (optional)
+        onTap: () {
+          // Optional: action if the whole card is tapped
+          // For now, specific actions are on buttons/items
+        },
+        splashColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1),
+        highlightColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.05),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'RSS: ${widget.config.feedSourceName}',
+                      style: Theme.of(context).textTheme.titleMedium, // Corrected style assignment
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.refresh, color: Colors.blueAccent),
-                  onPressed: _fetchItems,
-                  tooltip: 'Refresh Feed',
-                )
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            if (_isLoading)
-              const Expanded(child: Center(child: CircularProgressIndicator()))
-            else if (_feedItems.isEmpty)
-              const Expanded(child: Center(child: Text('No articles found.')))
-            else
-              Expanded(
-                child: ListView.builder(
-                  // Take top 3-5 items for summary
-                  itemCount: _feedItems.length > 5 ? 5 : _feedItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _feedItems[index];
-                    return ListTile(
-                      dense: true,
-                      title: Text(item.title ?? 'No Title', maxLines: 2, overflow: TextOverflow.ellipsis),
-                      subtitle: Text(item.pubDate != null ? item.pubDate!.substring(0,10) : '', maxLines: 1), // Show only date part
-                      onTap: item.link != null ? () => _launchUrl(item.link!) : null,
-                    );
-                  },
-                ),
+                  IconButton( // Already has feedback
+                    icon: const Icon(Icons.refresh, color: Colors.blueAccent),
+                    onPressed: _fetchItems,
+                    tooltip: 'Refresh Feed',
+                  )
+                ],
               ),
-            TextButton(
-              child: const Text('View all items...'),
-              onPressed: () {
-                Navigator.push(
+              const SizedBox(height: 8.0),
+              Expanded( // Ensure this Expanded takes the remaining space
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _feedItems.isEmpty
+                      ? Center(child: Text('No articles found.', style: Theme.of(context).textTheme.bodyMedium))
+                        : ListView.builder(
+                            // Take top 3-5 items for summary
+                            itemCount: _feedItems.length > 5 ? 5 : _feedItems.length,
+                            itemBuilder: (context, index) {
+                              final item = _feedItems[index];
+                              return ListTile( // ListTile provides its own feedback
+                                dense: true,
+                                title: Text(item.title ?? 'No Title', maxLines: 2, overflow: TextOverflow.ellipsis),
+                                subtitle: Text(item.pubDate != null ? item.pubDate!.substring(0,10) : '', maxLines: 1),
+                                onTap: item.link != null ? () => _launchUrl(item.link!) : null,
+                              );
+                            },
+                          ),
+              ), // End of Expanded, ensure comma if TextButton follows
+              TextButton( // Already has feedback
+                child: const Text('View all items...'),
+                onPressed: () {
+                  Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => FeedItemsView(
@@ -114,9 +120,10 @@ class _RssDashboardWidgetState extends State<RssDashboardWidget> {
                     ),
                   ),
                 );
-              },
-            )
-          ],
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

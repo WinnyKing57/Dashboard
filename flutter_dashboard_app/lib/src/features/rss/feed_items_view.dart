@@ -107,9 +107,9 @@ class _FeedItemsViewState extends State<FeedItemsView> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _errorMessage != null
-                ? Center(child: Padding(padding: const EdgeInsets.all(16.0), child: Text(_errorMessage!, textAlign: TextAlign.center)))
+                ? Center(child: Padding(padding: const EdgeInsets.all(16.0), child: Text(_errorMessage!, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.error))))
                 : _feedItems.isEmpty
-                    ? Center(child: Text('No items found for "${widget.feedSourceName}". Pull to refresh.'))
+                    ? Center(child: Text('No items found for "${widget.feedSourceName}". Pull to refresh.', style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center,))
                     : ListView.builder(
                         itemCount: _feedItems.length,
                         itemBuilder: (context, index) {

@@ -6,16 +6,26 @@ import 'package:webfeed/webfeed.dart';
 import 'package:uuid/uuid.dart';
 
 class RssService {
+  final http.Client client; // Added for dependency injection
+
   static const String _sourcesBoxName = 'rssFeedSourcesBox';
   static const String _itemsBoxName = 'rssFeedItemsBox';
   final Uuid _uuid = const Uuid();
+
+  // Constructor updated to accept an http.Client
+  RssService({http.Client? client}) : client = client ?? http.Client();
+
+  // FOR TEST PURPOSES ONLY
+  static String getSourcesBoxNameTestOnly() => _sourcesBoxName;
+  static String getItemsBoxNameTestOnly() => _itemsBoxName;
 
   Box<RssFeedSource> get _sourcesBox => Hive.box<RssFeedSource>(_sourcesBoxName);
   Box<RssFeedItem> get _itemsBox => Hive.box<RssFeedItem>(_itemsBoxName);
 
   Future<RssFeedSource?> addFeedSource(String url) async {
     try {
-      final response = await http.get(Uri.parse(url));
+      // Use the injected client
+      final response = await client.get(Uri.parse(url), headers: {'User-Agent': 'FlutterDashboardApp/1.0'});
       if (response.statusCode == 200) {
         String? feedTitle;
         try {
@@ -72,7 +82,8 @@ class RssService {
 
     List<RssFeedItem> fetchedItems = [];
     try {
-      final response = await http.get(Uri.parse(source.url));
+      // Use the injected client
+      final response = await client.get(Uri.parse(source.url), headers: {'User-Agent': 'FlutterDashboardApp/1.0'});
       if (response.statusCode == 200) {
         dynamic feed; // Can be RssFeed or AtomFeed
         try {

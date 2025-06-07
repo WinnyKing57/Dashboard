@@ -59,7 +59,7 @@ class _NotepadWidgetState extends State<NotepadWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Notepad', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('Notepad', style: Theme.of(context).textTheme.titleMedium),
                 IconButton(
                   icon: const Icon(Icons.save, color: Colors.blueAccent),
                   onPressed: _saveNote,

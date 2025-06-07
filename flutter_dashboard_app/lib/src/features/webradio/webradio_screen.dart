@@ -51,47 +51,52 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
   final AudioPlayer _audioPlayer = GlobalRadioState.audioPlayer;
   final TextEditingController _searchController = TextEditingController();
 
-  List<RadioStation> _stations = [];
+  List<RadioStation> _apiStations = []; // Stations fetched from API
+  List<FavoriteStation> _favoriteStations = []; // Loaded from Hive
   bool _isLoadingStations = false;
-  // RadioStation? _currentStation is now GlobalRadioState.currentStation;
-  // PlayerState? _playerState is now GlobalRadioState.playerState;
   bool _isSearching = false;
+  bool _showFavorites = false; // Toggle state
 
   StreamSubscription<PlayerState>? _playerStateSubscription;
-  // No need for StreamSubscription for currentStation here, will listen in widget if needed
 
   @override
   void initState() {
     super.initState();
     _playerStateSubscription = _audioPlayer.playerStateStream.listen((state) {
       if (mounted) {
-        GlobalRadioState.setPlayerState(state); // Update global state
-        setState(() {}); // Rebuild to reflect player state changes like play/pause button state
+        GlobalRadioState.setPlayerState(state);
+        setState(() {});
       }
     });
-     // Listen to global current station changes if needed by this screen directly for UI updates
-    // For example, if another part of the app could change the station.
-    // GlobalRadioState.currentStationStream.listen((station) {
-    //   if (mounted) setState(() {});
-    // });
-    _fetchInitialStations(); // Fetch some stations on init
+    _loadInitialData();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     _playerStateSubscription?.cancel();
-    // Do not dispose the global player here, it might be used by other widgets.
-    // _audioPlayer.dispose();
     super.dispose();
   }
 
-  Future<void> _fetchInitialStations() async {
-    // Fetch some popular stations by default, e.g., by a common tag or just top voted
-    _searchStations(term: "jazz"); // Example: initial search for "jazz"
+  Future<void> _loadInitialData() async {
+    await _loadFavorites(); // Load favorites first
+    if (!_showFavorites) {
+      await _fetchInitialApiStations(); // Then load API stations if not showing favs
+    }
   }
 
-  Future<void> _searchStations({String term = '', String countryCode = '', String tag = ''}) async {
+  Future<void> _loadFavorites() async {
+    if(mounted) setState(() { _isLoadingStations = true; });
+    _favoriteStations = _radioService.getFavoriteStations();
+    if(mounted) setState(() { _isLoadingStations = false; });
+  }
+
+  Future<void> _fetchInitialApiStations() async {
+    // Fetch some popular stations by default if not in favorite view
+    await _searchApiStations(term: "jazz");
+  }
+
+  Future<void> _searchApiStations({String term = '', String countryCode = '', String tag = ''}) async {
     if (mounted) {
       setState(() {
         _isLoadingStations = true;
@@ -106,7 +111,7 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
       );
       if (mounted) {
         setState(() {
-          _stations = stations;
+          _apiStations = stations;
         });
       }
     } catch (e) {
@@ -189,29 +194,85 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
   }
 
   @override
+  Future<void> _toggleFavorite(RadioStation station) async {
+    if (_radioService.isFavorite(station.stationuuid)) {
+      await _radioService.removeFavorite(station.stationuuid);
+    } else {
+      await _radioService.addFavorite(station);
+    }
+    // Refresh favorite list if currently shown, and update isFavorite state for icons
+    await _loadFavorites();
+    setState(() {}); // Rebuild to update icons and potentially list
+  }
+
+  List<RadioStation> get _displayedStations {
+    if (_showFavorites) {
+      // Convert FavoriteStation list to RadioStation list for display consistency
+      return _favoriteStations.map((fav) => RadioStation(
+        stationuuid: fav.stationuuid,
+        name: fav.name,
+        urlResolved: fav.urlResolved,
+        country: fav.country,
+        favicon: fav.favicon,
+        tags: fav.tags ?? [],
+        isFavorite: true, // Explicitly mark as favorite
+      )).toList();
+    }
+    return _apiStations;
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    // Use global state for isPlaying and isBuffering
     bool isPlaying = GlobalRadioState.playerState?.playing ?? false;
-    bool isBuffering = GlobalRadioState.playerState?.processingState == ProcessingState.buffering ||
-                       GlobalRadioState.playerState?.processingState == ProcessingState.loading;
+    ProcessingState? processingState = GlobalRadioState.playerState?.processingState;
+    bool isBuffering = processingState == ProcessingState.buffering ||
+                       processingState == ProcessingState.loading;
+    bool hasError = processingState == ProcessingState.error;
     RadioStation? currentStation = GlobalRadioState.currentStation;
+    final stationsToDisplay = _displayedStations;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web Radio'),
+        actions: [
+          FilterChip(
+            label: Text(_showFavorites ? 'Favorites' : 'All Stations', style: Theme.of(context).textTheme.labelLarge), // Themed label
+            selected: _showFavorites,
+            onSelected: (selected) {
+              setState(() {
+                _showFavorites = selected;
+                if (!_showFavorites && _apiStations.isEmpty) {
+                  _fetchInitialApiStations(); // Fetch API stations if switching to all and list is empty
+                } else if (_showFavorites) {
+                  _loadFavorites(); // Ensure favorites are up-to-date when switching
+                }
+              });
+            },
+            selectedColor: Theme.of(context).colorScheme.primaryContainer,
+            checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          )
+        ],
       ),
       body: Column(
         children: [
-          _buildSearchField(),
+          if (!_showFavorites) _buildSearchField(), // Only show search for All Stations
           _buildPlaybackControls(isPlaying, isBuffering),
           if (_isLoadingStations)
             const Expanded(child: Center(child: CircularProgressIndicator()))
-          else if (_stations.isEmpty && _isSearching)
-             Expanded(child: Center(child: Text('No stations found for "${_searchController.text}".')))
-          else if (_stations.isEmpty && !_isSearching)
-             const Expanded(child: Center(child: Text('Search for radio stations above.')))
+          else if (stationsToDisplay.isEmpty)
+             Expanded(child: Center(child: Padding(
+               padding: const EdgeInsets.all(16.0),
+               child: Text(
+                 _showFavorites
+                   ? 'No favorite stations yet. Tap the star to add one!'
+                   : (_isSearching ? 'No stations found for "${_searchController.text}".' : 'Search for radio stations.'),
+                 style: Theme.of(context).textTheme.bodyLarge,
+                 textAlign: TextAlign.center,
+               ),
+             )))
           else
-            _buildStationList(),
+            _buildStationList(stationsToDisplay),
         ],
       ),
     );
@@ -223,50 +284,60 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search stations by name, tag, country...',
+          hintText: 'Search all stations...',
           suffixIcon: IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              FocusScope.of(context).unfocus(); // Hide keyboard
-              _searchStations(term: _searchController.text);
+              FocusScope.of(context).unfocus();
+              _searchApiStations(term: _searchController.text);
             },
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
-        onSubmitted: (value) => _searchStations(term: value),
+        onSubmitted: (value) => _searchApiStations(term: value),
       ),
     );
   }
 
-  Widget _buildPlaybackControls(bool isPlaying, bool isBuffering, RadioStation? currentStation) {
+  Widget _buildPlaybackControls(bool isPlaying, bool isBuffering, bool hasError, RadioStation? currentStation) {
     return Card(
+      key: const ValueKey('webradio_player_controls'), // Added ValueKey here
       margin: const EdgeInsets.all(8.0),
-      // Make controls less prominent if no station is selected/playing
-      elevation: currentStation != null ? 2.0 : 0.5,
+      elevation: currentStation != null || hasError ? 2.0 : 0.5,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              currentStation?.name ?? 'No station selected',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: currentStation != null ? null : Colors.grey
-              ),
+              currentStation?.name ?? (hasError ? 'Playback Error' : 'No station selected'),
+              style: (currentStation != null || hasError
+                  ? Theme.of(context).textTheme.titleMedium
+                  : Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+              color: hasError ? Theme.of(context).colorScheme.error : null,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            if (currentStation != null)
+            if (currentStation != null && !hasError)
               Text(
                 currentStation.countryDisplay,
                 style: Theme.of(context).textTheme.bodySmall,
               )
-            else
+            else if (!hasError)
               Text("Use search above to find stations.", style: Theme.of(context).textTheme.bodySmall),
+
+            if(hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(
+                  "Could not play station. Try another.",
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
             const SizedBox(height: 8),
             if (isBuffering)
               const Center(child: CircularProgressIndicator())
-            else
+            else if (!hasError) // Only show buttons if no error
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -297,21 +368,42 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
     );
   }
 
-  Widget _buildStationList() {
-    RadioStation? currentStation = GlobalRadioState.currentStation; // Get current global station
+  Widget _buildStationList(List<RadioStation> stations) {
+    RadioStation? currentGlobalStation = GlobalRadioState.currentStation;
     return Expanded(
       child: ListView.builder(
-        itemCount: _stations.length,
+        itemCount: stations.length,
         itemBuilder: (context, index) {
-          final station = _stations[index];
-          bool isCurrentlyPlayingStation = currentStation?.stationuuid == station.stationuuid;
+          final station = stations[index];
+          bool isCurrentlyPlayingStation = currentGlobalStation?.stationuuid == station.stationuuid;
+          bool isFav = _radioService.isFavorite(station.stationuuid);
+
           return ListTile(
             leading: station.favicon != null && station.favicon!.isNotEmpty
                 ? Image.network(station.favicon!, width: 40, height: 40, errorBuilder: (c, o, s) => const Icon(Icons.radio))
                 : const Icon(Icons.radio),
-            title: Text(station.name, style: TextStyle(fontWeight: isCurrentlyPlayingStation ? FontWeight.bold : FontWeight.normal)),
-            subtitle: Text('${station.countryDisplay} - ${station.tags.take(2).join(', ')}'),
-            trailing: Text('${station.votes ?? 0} votes'),
+            title: Text(
+              station.name,
+              style: isCurrentlyPlayingStation
+                  ? Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)
+                  : Theme.of(context).textTheme.titleMedium
+            ),
+            subtitle: Text(
+              '${station.countryDisplay} - ${station.tags.take(2).join(', ')}',
+              style: Theme.of(context).textTheme.bodySmall
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(station.votes != null ? '${station.votes?.toInt()}' : '', style: Theme.of(context).textTheme.bodySmall), // Themed votes
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(isFav ? Icons.star : Icons.star_border, color: isFav ? Colors.amber : Theme.of(context).colorScheme.onSurfaceVariant),
+                  onPressed: () => _toggleFavorite(station),
+                  tooltip: isFav ? 'Remove from Favorites' : 'Add to Favorites',
+                ),
+              ],
+            ),
             selected: isCurrentlyPlayingStation,
             onTap: () => _playStation(station),
           );

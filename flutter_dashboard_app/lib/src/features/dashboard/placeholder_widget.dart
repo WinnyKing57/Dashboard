@@ -19,7 +19,7 @@ class PlaceholderWidget extends StatelessWidget {
               Text(
                 'Placeholder Widget',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16.0),
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
           ),

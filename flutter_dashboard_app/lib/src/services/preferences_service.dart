@@ -5,6 +5,9 @@ class PreferencesService {
   static const String _boxName = 'userPreferencesBox';
   static const String _prefsKey = 'currentUserPrefs';
 
+  // FOR TEST PURPOSES ONLY
+  static String getBoxNameTestOnly() => _boxName;
+
   Future<void> saveUserPreferences(UserPreferences preferences) async {
     final box = Hive.box<UserPreferences>(_boxName);
     await box.put(_prefsKey, preferences);

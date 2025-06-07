@@ -32,7 +32,13 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   hive_generator: ^2.0.1 # Latest version as of my knowledge
+  # Ensure build_runner is present for mockito
   build_runner: ^2.4.8 # Latest version as of my knowledge
+  mockito: ^5.4.4 # For mocking
+  integration_test: # No version specified, will take latest compatible
+    sdk: flutter
+  # flutter_driver: # Not strictly needed for integration_test package directly
+  #   sdk: flutter
 
 flutter:
   uses-material-design: true

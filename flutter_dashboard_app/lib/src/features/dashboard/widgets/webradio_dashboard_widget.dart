@@ -39,9 +39,9 @@ class _WebRadioDashboardWidgetState extends State<WebRadioDashboardWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween, // Aligns children
           children: <Widget>[
-            const Text(
+            Text(
               'Web Radio Status',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8.0),
             Expanded(
@@ -57,7 +57,7 @@ class _WebRadioDashboardWidgetState extends State<WebRadioDashboardWidget> {
                     const SizedBox(height: 8.0),
                     Text(
                       _currentStation?.name ?? 'No station playing',
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: Theme.of(context).textTheme.bodyLarge, // Changed from titleSmall for better visibility
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,

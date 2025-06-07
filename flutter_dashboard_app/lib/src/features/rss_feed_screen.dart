@@ -143,7 +143,7 @@ class _RssFeedScreenState extends State<RssFeedScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _feedSources.isEmpty
-              ? const Center(child: Text('No feed sources. Add some!'))
+              ? Center(child: Text('No feed sources. Add some!', style: Theme.of(context).textTheme.bodyLarge))
               : ListView.builder(
                   itemCount: _feedSources.length,
                   itemBuilder: (context, index) {

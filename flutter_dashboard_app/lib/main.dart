@@ -14,11 +14,13 @@ import 'package:flutter_dashboard_app/src/models/dashboard_item.g.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_source.g.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_item.g.dart';
 import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.g.dart'; // Will be generated
+import 'package:flutter_dashboard_app/src/models/favorite_station.g.dart'; // Will be generated
 import 'package:flutter_dashboard_app/src/models/notepad_data.dart'; // Needed for adapter registration
 import 'package:flutter_dashboard_app/src/models/dashboard_item.dart'; // Needed for adapter registration
 import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart'; // Needed for adapter registration
 import 'package:flutter_dashboard_app/src/models/rss_feed_item.dart'; // Needed for adapter registration
 import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.dart'; // Needed for adapter registration
+import 'package:flutter_dashboard_app/src/models/favorite_station.dart'; // Needed for adapter registration
 import 'package:workmanager/workmanager.dart'; // Import workmanager
 import 'package:flutter_dashboard_app/src/background_tasks.dart'; // Import background tasks
 
@@ -36,12 +38,14 @@ void main() async { // Make main async
   Hive.registerAdapter(RssFeedSourceAdapter());
   Hive.registerAdapter(RssFeedItemAdapter());
   Hive.registerAdapter(RssWidgetConfigAdapter());
+  Hive.registerAdapter(FavoriteStationAdapter());
 
   // Open Boxes
   await Hive.openBox<UserPreferences>('userPreferencesBox');
   await Hive.openBox<DashboardItem>('dashboardItemsBox');
   await Hive.openBox<RssFeedSource>('rssFeedSourcesBox');
   await Hive.openBox<RssFeedItem>('rssFeedItemsBox');
+  await Hive.openBox<FavoriteStation>('favoriteStationsBox');
   // No separate box for NotepadData as it's embedded in DashboardItem
 
   // Initialize Notifications
@@ -135,12 +139,18 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0; // Default to Dashboard screen
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    DashboardScreen(),
-    RssFeedScreen(),
-    WebRadioScreen(),
-    SettingsScreen(),
-  ];
+  late final List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _widgetOptions = <Widget>[
+      const DashboardScreen(),
+      const RssFeedScreen(),
+      const WebRadioScreen(),
+      SettingsScreen(onThemeChanged: widget.onThemeChanged), // Pass callback here
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {

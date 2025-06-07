@@ -9,6 +9,9 @@ class DashboardService {
   // static const String _notepadBoxName = 'notepadDataBox'; // If storing NotepadData separately
   final Uuid _uuid = const Uuid();
 
+  // FOR TEST PURPOSES ONLY
+  static String getBoxNameTestOnly() => _dashboardBoxName;
+
   Box<DashboardItem> get _dashboardBox => Hive.box<DashboardItem>(_dashboardBoxName);
   // Box<NotepadData> get _notepadBox => Hive.box<NotepadData>(_notepadBoxName);
 

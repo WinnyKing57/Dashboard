@@ -12,31 +12,43 @@ import 'package:flutter_dashboard_app/src/services/rss_service.dart'; // For fet
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  // For test injection
+  final DashboardService? _dashboardServiceForTest;
+  final RssService? _rssServiceForTest;
+
+  const DashboardScreen({
+    super.key,
+    DashboardService? dashboardServiceForTest,
+    RssService? rssServiceForTest,
+  }) : _dashboardServiceForTest = dashboardServiceForTest,
+       _rssServiceForTest = rssServiceForTest;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardService _dashboardService = DashboardService();
-  final RssService _rssService = RssService(); // For selecting RSS feed
+  late final DashboardService _dashboardService;
+  late final RssService _rssService;
   List<DashboardItem> _dashboardItems = [];
-  bool _isLoading = false; // For loading state
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _dashboardService = widget._dashboardServiceForTest ?? DashboardService();
+    _rssService = widget._rssServiceForTest ?? RssService();
     _loadDashboardItems();
   }
 
+  // Methods like _loadDashboardItems, _addInitialItems, etc. remain the same as the correct version from read_files output
+  // ... (assuming the rest of the methods from the read_files output are here and correct) ...
   Future<void> _loadDashboardItems() async {
     if(mounted) setState(() { _isLoading = true; });
     _dashboardItems = _dashboardService.getDashboardItems();
-    // If empty, add some default items
     if (_dashboardItems.isEmpty) {
       await _addInitialItems();
-       _dashboardItems = _dashboardService.getDashboardItems(); // reload after adding
+       _dashboardItems = _dashboardService.getDashboardItems();
     }
     if(mounted) setState(() { _isLoading = false; });
   }
@@ -44,7 +56,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _addInitialItems() async {
     await _dashboardService.createAndSavePlaceholderItem(0);
     await _dashboardService.createAndSaveNotepadItem(1);
-    // Optionally add a default RSS widget if feeds exist
     List<RssFeedSource> sources = _rssService.getFeedSources();
     if (sources.isNotEmpty) {
       await _dashboardService.createAndSaveRssWidgetConfigItem(
@@ -66,7 +77,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _addRssSummaryWidget() async {
-    // Show dialog to select an RSS feed
     List<RssFeedSource> sources = _rssService.getFeedSources();
     if (sources.isEmpty) {
       if(mounted) ScaffoldMessenger.of(context).showSnackBar(
@@ -123,12 +133,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       final item = _dashboardItems.removeAt(oldIndex);
       _dashboardItems.insert(newIndex, item);
-      // Update order field and persist
       _dashboardService.updateDashboardItemOrder(_dashboardItems);
     });
   }
 
-  Widget _buildWidgetItem(DashboardItem item, BuildContext context) { // Added context for potential navigation
+  Widget _buildWidgetItem(DashboardItem item, BuildContext context) {
     Widget content;
     switch (item.widgetType) {
       case 'notepad':
@@ -149,15 +158,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       default:
         content = const PlaceholderWidget();
     }
-    // Wrap with Stack for delete button
     return Stack(
-      key: ValueKey(item.id), // Important for reordering
+      key: ValueKey(item.id),
       children: [
         content,
         Positioned(
           top: 0,
           right: 0,
-          child: Material( // Ensures IconButton has Material parent for ink splash
+          child: Material(
             color: Colors.transparent,
             child: IconButton(
               icon: const Icon(Icons.close, color: Colors.redAccent, size: 18.0),
@@ -198,18 +206,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _dashboardItems.isEmpty
-              ? const Center(child: Text('No items on dashboard. Add some!'))
+              ? Center(child: Text('No items on dashboard. Add some!', style: Theme.of(context).textTheme.bodyLarge))
               : ReorderableGridView.builder(
                   padding: const EdgeInsets.all(8.0),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 8.0,
                     mainAxisSpacing: 8.0,
-                    childAspectRatio: 3 / 2, // Adjust as needed, might need to be more dynamic for different widget heights
+                    childAspectRatio: 3 / 2,
                   ),
                   itemCount: _dashboardItems.length,
                   itemBuilder: (context, index) {
-                    // Each item must have a unique key for ReorderableGridView
                     final item = _dashboardItems[index];
                     return _buildWidgetItem(item, context);
                   },

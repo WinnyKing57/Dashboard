@@ -23,7 +23,8 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final PreferencesService _prefsService = PreferencesService();
   final RssService _rssService = RssService();
-  final DashboardService _dashboardService = DashboardService(); // For clearing dashboard items if needed during import
+  final DashboardService _dashboardService = DashboardService();
+  final RadioService _radioService = RadioService(); // For favorites export/import
 
   late UserPreferences _currentPrefs;
   bool _isLoading = true;
@@ -124,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             "guid": item.guid, "title": item.title, "link": item.link, "description": item.description,
             "pubDate": item.pubDate, "feedSourceId": item.feedSourceId, "itemUniqueKey": item.itemUniqueKey
         }).toList(),
-        // WebRadio favorites to be added later
+        "radioFavorites": _radioService.exportFavorites(), // Export radio favorites
       };
 
       String jsonString = jsonEncode(exportJson);
@@ -190,9 +191,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
         // Clear existing data (carefully!)
         // This part needs to be implemented in each service
-        await _dashboardService.clearAllDashboardItems(); // You'll need to create this
-        await _rssService.clearAllRssData(); // You'll need to create this
-        // UserPreferences will be overwritten by save.
+        await _dashboardService.clearAllDashboardItems();
+        await _rssService.clearAllRssData();
+        await _radioService.importFavorites([]); // Clear existing radio favorites by importing empty list first
 
         // Import UserPreferences
         if (importJson['userPreferences'] != null) {
@@ -227,6 +228,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // Import Dashboard Items
         if (importJson['dashboardItems'] is List) {
            await _dashboardService.importDashboardItems(importJson['dashboardItems']); // You'll need to create this
+        }
+
+        _loadPreferences(); // Reload settings screen state
+        // Import Radio Favorites
+        if (importJson['radioFavorites'] is List) {
+          await _radioService.importFavorites(importJson['radioFavorites']);
         }
 
         _loadPreferences(); // Reload settings screen state
@@ -286,7 +293,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               items: ThemeMode.values.map((ThemeMode mode) {
                 return DropdownMenuItem<ThemeMode>(
                   value: mode,
-                  child: Text(mode.toString().split('.').last.capitalize()),
+                  child: Text(mode.toString().split('.').last.capitalize(), style: Theme.of(context).textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: _updateThemeMode,
@@ -308,7 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               items: _refreshFrequencies.map((int hours) {
                 return DropdownMenuItem<int>(
                   value: hours,
-                  child: Text('$hours hours'),
+                  child: Text('$hours hours', style: Theme.of(context).textTheme.bodyMedium),
                 );
               }).toList(),
               onChanged: _updateRssRefreshFrequency,
