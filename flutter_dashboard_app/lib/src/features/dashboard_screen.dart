@@ -154,6 +154,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'rss_summary':
         content = RssDashboardWidget(
           config: item.widgetData as RssWidgetConfig,
+          rssServiceForTest: _rssService, // Pass the screen's RssService instance
         );
         break;
       case 'webradio_status':

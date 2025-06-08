@@ -8,21 +8,27 @@ import 'package:url_launcher/url_launcher.dart';
 
 class RssDashboardWidget extends StatefulWidget {
   final RssWidgetConfig config;
+  final RssService? rssServiceForTest; // New field
 
-  const RssDashboardWidget({super.key, required this.config});
+  const RssDashboardWidget({
+    super.key,
+    required this.config,
+    this.rssServiceForTest, // Added to constructor
+  });
 
   @override
   State<RssDashboardWidget> createState() => _RssDashboardWidgetState();
 }
 
 class _RssDashboardWidgetState extends State<RssDashboardWidget> {
-  final RssService _rssService = RssService();
+  late RssService _rssService; // Made late
   List<RssFeedItem> _feedItems = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _rssService = widget.rssServiceForTest ?? RssService(); // Use injected or default
     _fetchItems();
   }
 

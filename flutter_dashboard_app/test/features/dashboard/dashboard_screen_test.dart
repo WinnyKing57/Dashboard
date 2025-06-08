@@ -69,6 +69,9 @@ void main() {
     // Default mock responses
     when(mockDashboardService.getDashboardItems()).thenAnswer((_) => List.from(mockStorageItems));
     when(mockRssService.getFeedSources()).thenReturn([]); // Default to no RSS sources
+    // Add default stubs for RssService methods that might be called by RssDashboardWidget
+    when(mockRssService.fetchAndCacheFeedItems(any)).thenAnswer((_) async => <RssFeedItem>[]);
+    when(mockRssService.getCachedFeedItems(any)).thenReturn(<RssFeedItem>[]);
 
     // Return Future.value for async methods
     // The actual DashboardService methods are called by the screen, which will interact with Hive.
@@ -252,10 +255,9 @@ void main() {
     // This mock for getFeedSources is specific to this test and overrides the default in setUp
     when(mockRssService.getFeedSources()).thenReturn(sourcesForMock);
 
-    // Save the source to the actual Hive box for RssDashboardWidget,
-    // in case RssDashboardWidget uses a real service instance that reads from Hive.
-    final rssSourcesBox = Hive.box<RssFeedSource>(RssService.getSourcesBoxNameTestOnly());
-    await rssSourcesBox.put(sourceToSave.id, sourceToSave);
+    // No longer need to save to Hive box directly, as RssDashboardWidget will use the MockRssService.
+    // final rssSourcesBox = Hive.box<RssFeedSource>(RssService.getSourcesBoxNameTestOnly());
+    // await rssSourcesBox.put(sourceToSave.id, sourceToSave);
 
     await tester.pumpWidget(createTestableWidget(
       DashboardScreen(
