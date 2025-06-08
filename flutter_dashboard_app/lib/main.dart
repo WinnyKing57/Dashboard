@@ -8,13 +8,6 @@ import 'package:flutter_dashboard_app/src/features/settings_screen.dart';
 import 'package:flutter_dashboard_app/src/services/preferences_service.dart';
 
 // Import generated adapters
-import 'package:flutter_dashboard_app/src/models/user_preferences.g.dart';
-import 'package:flutter_dashboard_app/src/models/notepad_data.g.dart';
-import 'package:flutter_dashboard_app/src/models/dashboard_item.g.dart';
-import 'package:flutter_dashboard_app/src/models/rss_feed_source.g.dart';
-import 'package:flutter_dashboard_app/src/models/rss_feed_item.g.dart';
-import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.g.dart';
-import 'package:flutter_dashboard_app/src/models/favorite_station.g.dart';
 import 'package:flutter_dashboard_app/src/models/notepad_data.dart';
 import 'package:flutter_dashboard_app/src/models/dashboard_item.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart';
