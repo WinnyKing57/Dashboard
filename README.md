@@ -2,9 +2,8 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Flutter](https://img.shields.io/badge/Flutter-3.19-blue.svg)](https://flutter.dev)
-[![Build Status](https://github.com/WinnyKing57/Dashboard/actions/workflows/flutter.yml/badge.svg)](https://github.com/WinnyKing57/Dashboard/actions)
-[![Tests](https://img.shields.io/github/workflow/status/WinnyKing57/Dashboard/Flutter%20CI?label=tests&logo=github)](https://github.com/WinnyKing57/Dashboard/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/github/WinnyKing57/Dashboard?logo=codecov)](https://app.codecov.io/gh/WinnyKing57/Dashboard)
+[![Build Status](https://github.com/WinnyKing57/Dashboard/actions/workflows/flutter CI.yml/badge.svg)](https://github.com/WinnyKing57/Dashboard/actions/workflows/flutter CI.yml)
+
 Application Flutter modulaire pour tableau de bord personnel : lecteur audio, agrégateur de contenu et widgets personnalisables.
 
 ---
