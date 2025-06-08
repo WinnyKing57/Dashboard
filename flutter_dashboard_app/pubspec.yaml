@@ -39,7 +39,7 @@ dev_dependencies:
   mockito: ^5.4.4
   integration_test:
     sdk: flutter
-  analyzer: ^7.4.5
+  analyzer: ^6.11.0
 
 flutter:
   uses-material-design: true
