@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
 
       - name: Run unit and widget tests
-        run: flutter test
+        run: flutter test -r expanded
         working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
         timeout-minutes: 20
 
