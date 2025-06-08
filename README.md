@@ -72,7 +72,7 @@ cd Dashboard/flutter_dashboard_app
 flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
-
+```
 ---
 
 📄 Licence
@@ -114,8 +114,6 @@ Exemple d’utilisation ou capture si nécessaire
 ---
 
 📬 Support
-
-📧 Email : à compléter
 
 🐞 Signaler un bug ou une suggestion
 
