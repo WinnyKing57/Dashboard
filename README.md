@@ -1,74 +1,56 @@
 # 📊 Flutter Dashboard App
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Flutter Version](https://img.shields.io/badge/Flutter-3.19-blue.svg)](https://flutter.dev)
-
+[![Flutter](https://img.shields.io/badge/Flutter-3.19-blue.svg)](https://flutter.dev)
+[![Build Status](https://github.com/WinnyKing57/Dashboard/actions/workflows/flutter.yml/badge.svg)](https://github.com/WinnyKing57/Dashboard/actions)
+[![Tests](https://img.shields.io/github/workflow/status/WinnyKing57/Dashboard/Flutter%20CI?label=tests&logo=github)](https://github.com/WinnyKing57/Dashboard/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/github/WinnyKing57/Dashboard?logo=codecov)](https://app.codecov.io/gh/WinnyKing57/Dashboard)
 Application Flutter modulaire pour tableau de bord personnel : lecteur audio, agrégateur de contenu et widgets personnalisables.
 
 ---
 
 ## 📸 Aperçu
 
-<p align="center">
-  <img src="assets/screenshots/dashboard.png" width="30%" alt="Dashboard">
-  <img src="assets/screenshots/rss.png" width="30%" alt="Lecteur RSS"> 
-  <img src="assets/screenshots/radio.png" width="30%" alt="WebRadio">
-</p>
+| Tableau de bord | Lecteur RSS | WebRadio |
+|:---------------:|:-----------:|:--------:|
+| ![Dashboard](assets/screenshots/dashboard.png) | ![RSS](assets/screenshots/rss.png) | ![Radio](assets/screenshots/radio.png) |
 
 ---
 
 ## 🚀 Fonctionnalités
 
-### 🎯 Modules Principaux
-- **🎵 Lecteur WebRadio** : Streaming audio avec `just_audio`
-- **📰 Agrégateur RSS** : Récupération automatique via `webfeed`
-- **🧩 Widgets Dynamiques** : Grille réorganisable avec `reorderable_grid_view`
+### 🎯 Modules principaux
+- **🎵 Lecteur WebRadio** — Streaming avec `just_audio`
+- **📰 Agrégateur RSS** — Synchronisation via `webfeed`
+- **🧩 Widgets dynamiques** — Grille personnalisable avec `reorderable_grid_view`
 
 ### ⚙️ Infrastructure
-- **🗄️ Stockage local** : Données persistées avec Hive
-- **🔄 Tâches en arrière-plan** : Rafraîchissement avec `workmanager`
-- **🔔 Notifications** : Alertes personnalisées intégrées
+- **🗄️ Stockage local** — Persisté avec Hive
+- **🔄 Tâches en arrière-plan** — `workmanager` pour actualisation périodique
+- **🔔 Notifications** — Alertes locales et rappels
 
 ### 🎨 Personnalisation
-- Thème clair/sombre
-- Disposition des widgets modulable
-- Gestion des flux RSS personnalisés
+- Thème clair / sombre
+- Disposition des widgets
+- Flux RSS configurables
 
 ---
 
-## 🧠 Architecture Technique
+## 🧠 Architecture technique
 
-```plaintext
-lib/
-├── src/
-│   ├── core/
-│   │   ├── app_widgets/    # Composants réutilisables
-│   │   └── utils/          # Fonctions utilitaires & extensions
-│   ├── features/
-│   │   ├── dashboard/      # Écran principal
-│   │   ├── rss/            # Module RSS
-│   │   └── radio/          # Lecteur audio
-│   ├── data/
-│   │   ├── models/         # Modèles Hive
-│   │   └── repositories/   # Abstraction des données
-│   └── presentation/
-│       ├── bloc/           # Gestion d'état
-│       └── pages/          # Écrans UI
-
+lib/ ├── src/ │   ├── core/ │   │   ├── app_widgets/    # Composants réutilisables │   │   └── utils/          # Fonctions utilitaires │   ├── features/ │   │   ├── dashboard/      # Écran principal │   │   ├── rss/            # Module RSS │   │   └── radio/          # Lecteur audio │   ├── data/ │   │   ├── models/         # Modèles Hive │   │   └── repositories/   # Accès aux données │   └── presentation/ │       ├── bloc/           # Gestion d'état │       └── pages/          # Écrans UI
 
 ---
 
-🛠 Installation
+## 🛠 Installation
 
-✅ Prérequis
+### ✅ Prérequis
+- Flutter ≥ 3.19
+- Android Studio / Xcode
 
-Flutter ≥ 3.19
+### ▶️ Démarrage
 
-Android Studio / Xcode
-
-
-▶️ Lancement
-
+```bash
 git clone https://github.com/WinnyKing57/Dashboard.git
 cd Dashboard/flutter_dashboard_app
 
@@ -76,51 +58,43 @@ flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 
-
 ---
 
 📄 Licence
 
-Distribué sous la licence GNU AGPLv3.
+Ce projet est distribué sous la licence GNU AGPLv3.
 
-> Résumé :
+> Résumé des obligations :
 
-Obligation de publier les modifications sous la même licence
+Toute modification doit être publiée sous la même licence
 
-Code source requis même en cas d'hébergement distant (SaaS)
+Fourniture du code source intégral
 
-Protection forte de la liberté logicielle
-
-
+Valable même pour les services hébergés (SaaS)
 
 
 © 2024 WinnyKing57
 
-Ce programme est libre : vous pouvez le redistribuer et/ou le modifier selon les termes de la
-GNU Affero General Public License publiée par la Free Software Foundation, version 3 ou ultérieure.
-
+Ce programme est libre : vous pouvez le redistribuer et/ou le modifier selon les termes
+de la GNU Affero General Public License, version 3 ou ultérieure, publiée par la Free Software Foundation.
 
 ---
 
 🤝 Contribution
 
-1. Créer une issue pour discuter d'une amélioration ou correction
+1. Créer une issue pour discuter d’une amélioration ou correction
 
 
-2. Utiliser une branche nommée feat/... ou fix/...
+2. Créer une branche feat/nom-fonctionnalité ou fix/description-bug
 
 
-3. Soumettre une Pull Request :
+3. Ouvrir une Pull Request contenant :
 
-Avec tests si applicable
+Tests si applicables
 
 Documentation mise à jour
 
-Exemple ou capture d’écran si pertinent
-
-
-
-
+Exemple d’utilisation ou capture si nécessaire
 
 ---
 
@@ -128,9 +102,7 @@ Exemple ou capture d’écran si pertinent
 
 📧 Email : à compléter
 
-🐞 Ouvrir une issue
-
-
+🐞 Signaler un bug ou une suggestion
 
 ---
 
