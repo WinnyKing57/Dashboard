@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart'; // Import Hive
-import 'package:flutter_dashboard_app/src/models/user_preferences.dart'; // Import UserPreferences
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_dashboard_app/src/models/user_preferences.dart';
 import 'package:flutter_dashboard_app/src/features/dashboard_screen.dart';
 import 'package:flutter_dashboard_app/src/features/rss_feed_screen.dart';
 import 'package:flutter_dashboard_app/src/features/web_radio_screen.dart';
 import 'package:flutter_dashboard_app/src/features/settings_screen.dart';
-import 'package:flutter_dashboard_app/src/services/preferences_service.dart'; // Import PreferencesService
+import 'package:flutter_dashboard_app/src/services/preferences_service.dart';
 
 // Import generated adapters
 import 'package:flutter_dashboard_app/src/models/user_preferences.g.dart';
@@ -13,25 +13,28 @@ import 'package:flutter_dashboard_app/src/models/notepad_data.g.dart';
 import 'package:flutter_dashboard_app/src/models/dashboard_item.g.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_source.g.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_item.g.dart';
-import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.g.dart'; // Will be generated
-import 'package:flutter_dashboard_app/src/models/favorite_station.g.dart'; // Will be generated
-import 'package:flutter_dashboard_app/src/models/notepad_data.dart'; // Needed for adapter registration
-import 'package:flutter_dashboard_app/src/models/dashboard_item.dart'; // Needed for adapter registration
-import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart'; // Needed for adapter registration
-import 'package:flutter_dashboard_app/src/models/rss_feed_item.dart'; // Needed for adapter registration
-import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.dart'; // Needed for adapter registration
-import 'package:flutter_dashboard_app/src/models/favorite_station.dart'; // Needed for adapter registration
-import 'package:workmanager/workmanager.dart'; // Import workmanager
-import 'package:flutter_dashboard_app/src/background_tasks.dart'; // Import background tasks
+import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.g.dart';
+import 'package:flutter_dashboard_app/src/models/favorite_station.g.dart';
+import 'package:flutter_dashboard_app/src/models/notepad_data.dart';
+import 'package:flutter_dashboard_app/src/models/dashboard_item.dart';
+import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart';
+import 'package:flutter_dashboard_app/src/models/rss_feed_item.dart';
+import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.dart';
+import 'package:flutter_dashboard_app/src/models/favorite_station.dart';
 
+import 'package:workmanager/workmanager.dart';
+import 'package:flutter_dashboard_app/src/background_tasks.dart';
 
-void main() async { // Make main async
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
+// Il faut que initializeNotifications() soit définie quelque part dans ton code.
+// Assure-toi qu’elle est importée ici si elle est dans un autre fichier.
 
-  // Initialize Hive
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialise Hive
   await Hive.initFlutter();
 
-  // Register Adapters
+  // Enregistre les adaptateurs Hive
   Hive.registerAdapter(UserPreferencesAdapter());
   Hive.registerAdapter(NotepadDataAdapter());
   Hive.registerAdapter(DashboardItemAdapter());
@@ -40,36 +43,33 @@ void main() async { // Make main async
   Hive.registerAdapter(RssWidgetConfigAdapter());
   Hive.registerAdapter(FavoriteStationAdapter());
 
-  // Open Boxes
+  // Ouvre les boîtes Hive
   await Hive.openBox<UserPreferences>('userPreferencesBox');
   await Hive.openBox<DashboardItem>('dashboardItemsBox');
   await Hive.openBox<RssFeedSource>('rssFeedSourcesBox');
   await Hive.openBox<RssFeedItem>('rssFeedItemsBox');
   await Hive.openBox<FavoriteStation>('favoriteStationsBox');
-  // No separate box for NotepadData as it's embedded in DashboardItem
 
-  // Initialize Notifications
+  // Initialise les notifications (fonction à définir)
   await initializeNotifications();
 
-  // Initialize Workmanager
+  // Initialise Workmanager pour les tâches en arrière-plan
   await Workmanager().initialize(
-    callbackDispatcher, // The top-level callback function
-    isInDebugMode: true, // Set to false for production
+    callbackDispatcher,
+    isInDebugMode: true, // false en production
   );
 
-  // Register periodic task
+  // Enregistre la tâche périodique
   Workmanager().registerPeriodicTask(
-    "1", // Unique name for the task
-    rssRefreshTask, // Task name defined in background_tasks.dart
-    frequency: const Duration(hours: 6), // Adjust frequency as needed
-    constraints: Constraints(
-      networkType: NetworkType.connected, // Only run when connected to a network
-    ),
+    "1",
+    rssRefreshTask,
+    frequency: const Duration(hours: 6),
+    constraints: Constraints(networkType: NetworkType.connected),
   );
 
-  // Load preferences
+  // Charge les préférences utilisateur
   final preferencesService = PreferencesService();
-  final userPreferences = preferencesService.getUserPreferences();
+  final userPreferences = await preferencesService.getUserPreferences();
 
   runApp(MyApp(initialThemeModeName: userPreferences.themeModeName));
 }
@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   ThemeMode _getThemeModeFromString(String themeString) {
-    switch (themeString) {
+    switch (themeString.toLowerCase()) {
       case 'light':
         return ThemeMode.light;
       case 'dark':
@@ -114,16 +114,15 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Dashboard App',
       theme: ThemeData(
-        colorSchemeSeed: Colors.blue, // Using colorSchemeSeed for M3
+        colorSchemeSeed: Colors.blue,
         brightness: Brightness.light,
-        // fontFamily: 'YourCustomFont',
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: Colors.blue, // Using colorSchemeSeed for M3
+        colorSchemeSeed: Colors.blue,
         brightness: Brightness.dark,
       ),
-      themeMode: _themeMode, // Use state variable
-      home: MainNavigationScreen(onThemeChanged: _updateThemeMode), // Pass callback
+      themeMode: _themeMode,
+      home: MainNavigationScreen(onThemeChanged: _updateThemeMode),
     );
   }
 }
@@ -137,7 +136,7 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _selectedIndex = 0; // Default to Dashboard screen
+  int _selectedIndex = 0;
 
   late final List<Widget> _widgetOptions;
 
@@ -148,7 +147,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const DashboardScreen(),
       const RssFeedScreen(),
       const WebRadioScreen(),
-      SettingsScreen(onThemeChanged: widget.onThemeChanged), // Pass callback here
+      SettingsScreen(onThemeChanged: widget.onThemeChanged),
     ];
   }
 
@@ -161,33 +160,19 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.rss_feed),
-            label: 'RSS',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.radio),
-            label: 'Web Radio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+          BottomNavigationBarItem(icon: Icon(Icons.rss_feed), label: 'RSS'),
+          BottomNavigationBarItem(icon: Icon(Icons.radio), label: 'Web Radio'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue, // Example color
-        unselectedItemColor: Colors.grey, // Example color
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // To ensure all labels are visible
+        type: BottomNavigationBarType.fixed,
       ),
     );
   }
