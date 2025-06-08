@@ -1,120 +1,140 @@
-```markdown
 # 📊 Flutter Dashboard App
 
-[![AGPLv3 License](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Flutter](https://img.shields.io/badge/Flutter-3.19-blue)](https://flutter.dev)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Flutter Version](https://img.shields.io/badge/Flutter-3.19-blue.svg)](https://flutter.dev)
 
-Application Flutter modulaire offrant un tableau de bord personnel avec lecteur audio, agrégation de contenu et widgets personnalisables.
+Application Flutter modulaire pour tableau de bord personnel : lecteur audio, agrégateur de contenu et widgets personnalisables.
 
-## 📌 Aperçu
+---
 
-<div align="center">
+## 📸 Aperçu
+
+<p align="center">
   <img src="assets/screenshots/dashboard.png" width="30%" alt="Dashboard">
   <img src="assets/screenshots/rss.png" width="30%" alt="Lecteur RSS"> 
   <img src="assets/screenshots/radio.png" width="30%" alt="WebRadio">
-</div>
+</p>
+
+---
 
 ## 🚀 Fonctionnalités
 
 ### 🎯 Modules Principaux
-- **🎵 Lecteur WebRadio**  
-  Intégration avec `just_audio` pour le streaming audio
-- **📰 Agrégateur RSS**  
-  Synchronisation automatique via `webfeed`
-- **🧩 Widgets Dynamiques**  
-  Grille personnalisable avec `reorderable_grid_view`
+- **🎵 Lecteur WebRadio** : Streaming audio avec `just_audio`
+- **📰 Agrégateur RSS** : Récupération automatique via `webfeed`
+- **🧩 Widgets Dynamiques** : Grille réorganisable avec `reorderable_grid_view`
 
 ### ⚙️ Infrastructure
-- **🗄️ Stockage Local**  
-  Gestion des données avec Hive
-- **🔄 Tâches Background**  
-  Actualisation périodique via `workmanager`
-- **🔔 Système de Notifications**  
-  Alertes et rappels personnalisés
+- **🗄️ Stockage local** : Données persistées avec Hive
+- **🔄 Tâches en arrière-plan** : Rafraîchissement avec `workmanager`
+- **🔔 Notifications** : Alertes personnalisées intégrées
 
 ### 🎨 Personnalisation
-- Thème clair/sombre adaptable
-- Disposition modifiable des widgets
-- Gestion des flux RSS personnels
+- Thème clair/sombre
+- Disposition des widgets modulable
+- Gestion des flux RSS personnalisés
 
-## 📦 Architecture Technique
+---
+
+## 🧠 Architecture Technique
 
 ```plaintext
 lib/
 ├── src/
 │   ├── core/
 │   │   ├── app_widgets/    # Composants réutilisables
-│   │   └── utils/          # Helpers et extensions
+│   │   └── utils/          # Fonctions utilitaires & extensions
 │   ├── features/
 │   │   ├── dashboard/      # Écran principal
-│   │   ├── rss/           # Module RSS
-│   │   └── radio/         # Player audio  
+│   │   ├── rss/            # Module RSS
+│   │   └── radio/          # Lecteur audio
 │   ├── data/
-│   │   ├── models/        # Structures Hive
-│   │   └── repositories/  # Gestion des données
+│   │   ├── models/         # Modèles Hive
+│   │   └── repositories/   # Abstraction des données
 │   └── presentation/
-│       ├── bloc/          # Gestion d'état
-│       └── pages/         # Écrans
-```
+│       ├── bloc/           # Gestion d'état
+│       └── pages/          # Écrans UI
 
-## 🛠 Guide d'Installation
-
-### Prérequis
-- Flutter 3.19+
-- Android Studio/Xcode (pour le build natif)
-
-### 🚀 Lancement
-```bash
-git clone https://github.com/WinnyKing57/Dashboard.git
-cd Dashboard/flutter_dashboard_app
-
-# Installer les dépendances
-flutter pub get
-
-# Générer le code Hive
-flutter pub run build_runner build --delete-conflicting-outputs
-
-# Lancer en mode développement
-flutter run
-```
-
-## 📜 Licence AGPLv3
-
-Ce projet est distribué sous licence [GNU Affero General Public License v3.0](LICENSE).
-
-**Obligations principales** :
-- Toute modification doit être publiée sous la même licence
-- Obligation de fournir le code source complet
-- Applicable même pour une utilisation en réseau (SaaS)
-
-```text
-Copyright (C) 2024 WinnyKing57
-
-Ce programme est libre : vous pouvez le redistribuer et/ou le modifier
-selon les termes de la GNU Affero General Public License telle que publiée
-par la Free Software Foundation, soit la version 3 de la Licence, soit
-(à votre choix) toute version ultérieure.
-```
-
-## 🤝 Contribution
-
-### Processus recommandé :
-1. Ouvrir une issue pour discuter des changements
-2. Créer une branche (`feat/feature-name` ou `fix/bug-description`)
-3. Soumettre une Pull Request avec :
-   - Tests unitaires pertinents
-   - Documentation mise à jour
-   - Exemple d'utilisation si applicable
-
-## 📞 Support
-
-Pour toute question :
-- 📧 Email : Démarrer une conversation ()
-- 🐛 [Ouvrir une issue](https://github.com/WinnyKing57/Dashboard/issues)
 
 ---
 
-<div align="center">
+🛠 Installation
+
+✅ Prérequis
+
+Flutter ≥ 3.19
+
+Android Studio / Xcode
+
+
+▶️ Lancement
+
+git clone https://github.com/WinnyKing57/Dashboard.git
+cd Dashboard/flutter_dashboard_app
+
+flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+flutter run
+
+
+---
+
+📄 Licence
+
+Distribué sous la licence GNU AGPLv3.
+
+> Résumé :
+
+Obligation de publier les modifications sous la même licence
+
+Code source requis même en cas d'hébergement distant (SaaS)
+
+Protection forte de la liberté logicielle
+
+
+
+
+© 2024 WinnyKing57
+
+Ce programme est libre : vous pouvez le redistribuer et/ou le modifier selon les termes de la
+GNU Affero General Public License publiée par la Free Software Foundation, version 3 ou ultérieure.
+
+
+---
+
+🤝 Contribution
+
+1. Créer une issue pour discuter d'une amélioration ou correction
+
+
+2. Utiliser une branche nommée feat/... ou fix/...
+
+
+3. Soumettre une Pull Request :
+
+Avec tests si applicable
+
+Documentation mise à jour
+
+Exemple ou capture d’écran si pertinent
+
+
+
+
+
+---
+
+📬 Support
+
+📧 Email : à compléter
+
+🐞 Ouvrir une issue
+
+
+
+---
+
+<p align="center">
   Développé avec ❤️ par <a href="https://github.com/WinnyKing57">WinnyKing57</a>
-</div>
+</p>
 ```
