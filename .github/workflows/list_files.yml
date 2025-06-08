@@ -1,8 +1,7 @@
 name: List Project Files
 
-# Permet l'exécution manuelle depuis l'interface GitHub Actions
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   list_all_files:
@@ -10,33 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Étape 1 : Récupérer le code du dépôt
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1 # Récupère uniquement le dernier commit (suffisant ici)
 
-      # Étape 2 : Afficher le chemin de travail utilisé par GitHub
-      - name: Print current working directory
+      - name: List all files recursively
         run: |
-          echo "Current working directory:"
-          pwd
-          echo "Contents of current directory:"
-          ls -la
-
-      # Étape 3 : Lister tous les fichiers avec `ls` (vue détaillée et récursive)
-      - name: List all files with ls -laR
-        run: |
-          echo "Listing all files and directories recursively with ls:"
+          echo "Listing all files and directories from the repository root (GITHUB_WORKSPACE):"
           ls -laR $GITHUB_WORKSPACE
-
-      # Étape 4 : Lister avec `tree` si disponible, sinon fallback avec `find`
-      - name: List project structure with tree or find
-        run: |
-          echo "Attempting to display project structure:"
-          if command -v tree &> /dev/null; then
-            echo "Using tree:"
-            tree -a -L 5 $GITHUB_WORKSPACE
+          echo "
+Listing files in GITHUB_WORKSPACE with tree (if available, otherwise find):"
+          if command -v tree &> /dev/null
+          then
+            tree $GITHUB_WORKSPACE
           else
-            echo "'tree' not available. Using find instead:"
             find $GITHUB_WORKSPACE -print
+          fi
+# Trigger re-evaluation by GitHub Actions
