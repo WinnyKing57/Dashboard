@@ -37,7 +37,23 @@ Application Flutter modulaire pour tableau de bord personnel : lecteur audio, ag
 
 ## 🧠 Architecture technique
 
-lib/ ├── src/ │   ├── core/ │   │   ├── app_widgets/    # Composants réutilisables │   │   └── utils/          # Fonctions utilitaires │   ├── features/ │   │   ├── dashboard/      # Écran principal │   │   ├── rss/            # Module RSS │   │   └── radio/          # Lecteur audio │   ├── data/ │   │   ├── models/         # Modèles Hive │   │   └── repositories/   # Accès aux données │   └── presentation/ │       ├── bloc/           # Gestion d'état │       └── pages/          # Écrans UI
+```plaintext
+lib/
+├── src/
+│   ├── core/
+│   │   ├── app_widgets/    # Composants réutilisables
+│   │   └── utils/          # Helpers et extensions
+│   ├── features/
+│   │   ├── dashboard/      # Écran principal
+│   │   ├── rss/           # Module RSS
+│   │   └── radio/         # Player audio  
+│   ├── data/
+│   │   ├── models/        # Structures Hive
+│   │   └── repositories/  # Gestion des données
+│   └── presentation/
+│       ├── bloc/          # Gestion d'état
+│       └── pages/         # Écrans
+```
 
 ---
 
