@@ -24,3 +24,4 @@ Listing files in GITHUB_WORKSPACE with tree (if available, otherwise find):"
           else
             find $GITHUB_WORKSPACE -print
           fi
+# Trigger re-evaluation by GitHub Actions
