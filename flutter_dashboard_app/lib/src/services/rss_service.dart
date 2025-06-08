@@ -127,7 +127,7 @@ class RssService {
                 if (linkToUse == null) {
                   linkToUse = item.links!.first;
                 }
-                extractedLink = linkToUse.href; // Assuming href is non-null on AtomLink
+                extractedLink = linkToUse?.href;
               }
 
               final rssItem = RssFeedItem(
