@@ -51,19 +51,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _addInitialItems() async {
-    await _dashboardService.createAndSavePlaceholderItem(0);
-    await _dashboardService.createAndSaveNotepadItem(1);
+    int currentOrder = 0;
+    // Ensure we use the service instance available in the state
+    await _dashboardService.createAndSavePlaceholderItem(currentOrder++);
+    await _dashboardService.createAndSaveNotepadItem(currentOrder++);
+
     List<RssFeedSource> sources = _rssService.getFeedSources();
     if (sources.isNotEmpty) {
       await _dashboardService.createAndSaveRssWidgetConfigItem(
-        2,
+        currentOrder++,
         RssWidgetConfig(
           feedSourceId: sources.first.id,
           feedSourceName: sources.first.name ?? sources.first.url,
         ),
       );
     }
-    await _dashboardService.createAndSaveWebRadioStatusItem(3);
+    await _dashboardService.createAndSaveWebRadioStatusItem(currentOrder++);
   }
 
   Future<void> _addNotepadWidget() async {
