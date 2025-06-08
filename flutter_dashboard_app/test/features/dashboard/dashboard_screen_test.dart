@@ -1,3 +1,4 @@
+import 'package:flutter_dashboard_app/src/features/dashboard/widgets/rss_dashboard_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_app/src/features/dashboard_screen.dart';
 import 'package:flutter_dashboard_app/src/features/dashboard/placeholder_widget.dart';
