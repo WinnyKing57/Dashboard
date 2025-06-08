@@ -26,15 +26,15 @@ void main() {
     mockRssService = MockRssService();
 
     // Default mock responses
-    when(mockDashboardService.getDashboardItems()).thenReturn([]);
-    when(mockRssService.getFeedSources()).thenReturn([]);
-    // Return Future.value for async methods
-    when(mockDashboardService.createAndSavePlaceholderItem(any)).thenAnswer((_) async => DashboardItem(id: 'p${DateTime.now().millisecondsSinceEpoch}', widgetType: 'placeholder', order: 0));
-    when(mockDashboardService.createAndSaveNotepadItem(any)).thenAnswer((_) async => DashboardItem(id: 'n${DateTime.now().millisecondsSinceEpoch}', widgetType: 'notepad', order: 0, widgetData: NotepadData(content: '')));
-    when(mockDashboardService.createAndSaveRssWidgetConfigItem(any, any)).thenAnswer((_) async => DashboardItem(id: 'r${DateTime.now().millisecondsSinceEpoch}', widgetType: 'rss_summary', order: 0, widgetData: RssWidgetConfig(feedSourceId: 'id', feedSourceName: 'name')));
-    when(mockDashboardService.createAndSaveWebRadioStatusItem(any)).thenAnswer((_) async => DashboardItem(id: 'w${DateTime.now().millisecondsSinceEpoch}', widgetType: 'webradio_status', order: 0));
-    when(mockDashboardService.deleteDashboardItem(any)).thenAnswer((_) async {});
-    when(mockDashboardService.updateDashboardItemOrder(any)).thenAnswer((_) async {});
+    // when(mockDashboardService.getDashboardItems()).thenReturn([]);
+    // when(mockRssService.getFeedSources()).thenReturn([]);
+    // // Return Future.value for async methods
+    // when(mockDashboardService.createAndSavePlaceholderItem(any)).thenAnswer((_) async => DashboardItem(id: 'p${DateTime.now().millisecondsSinceEpoch}', widgetType: 'placeholder', order: 0));
+    // when(mockDashboardService.createAndSaveNotepadItem(any)).thenAnswer((_) async => DashboardItem(id: 'n${DateTime.now().millisecondsSinceEpoch}', widgetType: 'notepad', order: 0, widgetData: NotepadData(content: '')));
+    // when(mockDashboardService.createAndSaveRssWidgetConfigItem(any, any)).thenAnswer((_) async => DashboardItem(id: 'r${DateTime.now().millisecondsSinceEpoch}', widgetType: 'rss_summary', order: 0, widgetData: RssWidgetConfig(feedSourceId: 'id', feedSourceName: 'name')));
+    // when(mockDashboardService.createAndSaveWebRadioStatusItem(any)).thenAnswer((_) async => DashboardItem(id: 'w${DateTime.now().millisecondsSinceEpoch}', widgetType: 'webradio_status', order: 0));
+    // when(mockDashboardService.deleteDashboardItem(any)).thenAnswer((_) async {});
+    // when(mockDashboardService.updateDashboardItemOrder(any)).thenAnswer((_) async {});
   });
 
   Widget createTestableWidget(Widget child) {

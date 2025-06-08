@@ -1,0 +1,27 @@
+name: List Project Files
+
+on:
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  list_all_files:
+    name: List All Project Files Recursively
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List all files recursively
+        run: |
+          echo "Listing all files and directories from the repository root (GITHUB_WORKSPACE):"
+          ls -laR $GITHUB_WORKSPACE
+          echo "
+Listing files in GITHUB_WORKSPACE with tree (if available, otherwise find):"
+          if command -v tree &> /dev/null
+          then
+            tree $GITHUB_WORKSPACE
+          else
+            find $GITHUB_WORKSPACE -print
+          fi
+# Trigger re-evaluation by GitHub Actions
