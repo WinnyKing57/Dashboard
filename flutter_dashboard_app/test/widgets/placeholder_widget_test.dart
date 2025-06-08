@@ -6,9 +6,9 @@ void main() {
   testWidgets('PlaceholderWidget renders correctly', (WidgetTester tester) async {
     // Build our widget and trigger a frame.
     await tester.pumpWidget(
-      const MaterialApp(
+      MaterialApp( // Removed const
         home: Scaffold(
-          body: PlaceholderWidget(),
+          body: PlaceholderWidget(), // Removed const
         ),
       ),
     );
