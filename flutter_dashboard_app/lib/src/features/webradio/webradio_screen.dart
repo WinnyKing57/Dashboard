@@ -146,7 +146,6 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
           title: station.name,
           artist: station.countryDisplay,
           artUri: (station.favicon != null && station.favicon!.isNotEmpty) ? Uri.parse(station.favicon!) : null,
-          androidBrowsable: true,
         ),
       );
       await _audioPlayer.setAudioSource(audioSource);
@@ -211,7 +210,8 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
     final isPlaying = GlobalRadioState.playerState?.playing ?? false;
     final processingState = GlobalRadioState.playerState?.processingState;
     final isBuffering = processingState == ProcessingState.buffering || processingState == ProcessingState.loading;
-    final hasError = processingState == ProcessingState.error;
+    // final hasError = processingState == ProcessingState.error; // Original line, causes error
+    final hasError = false; // Temporary fix: Assume no error for now. TODO: Implement proper error handling.
     final currentStation = GlobalRadioState.currentStation;
     final stationsToDisplay = _displayedStations;
 

@@ -113,11 +113,28 @@ class RssService {
             }
           } else if (feed is AtomFeed) {
             for (var item in feed.items ?? []) {
+              String? extractedLink;
+              if (item.links != null && item.links!.isNotEmpty) {
+                AtomLink? linkToUse;
+                // Try to find 'alternate'
+                for (final link in item.links!) {
+                  if (link.rel == 'alternate') {
+                    linkToUse = link;
+                    break;
+                  }
+                }
+                // If no 'alternate', use the first link
+                if (linkToUse == null) {
+                  linkToUse = item.links!.first;
+                }
+                extractedLink = linkToUse.href; // Assuming href is non-null on AtomLink
+              }
+
               final rssItem = RssFeedItem(
                 // Atom uses 'id' for guid, 'updated' for pubDate
                 guid: item.id,
                 title: item.title,
-                link: item.links?.firstWhere((link) => link.rel == 'alternate', orElse: () => item.links?.first).href,
+                link: extractedLink,
                 description: item.summary ?? item.content,
                 pubDate: item.updated?.toIso8601String(),
                 feedSourceId: feedSourceId,
