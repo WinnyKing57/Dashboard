@@ -56,6 +56,7 @@ jobs:
       - name: Run unit and widget tests
         run: flutter test
         working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
+        timeout-minutes: 20
 
       # Integration tests require an emulator or device, which is more complex for CI.
       # - name: Run integration tests (Placeholder - requires emulator/device setup)
@@ -65,8 +66,9 @@ jobs:
       #   working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
 
       - name: Build Android APK (Debug)
-        run: flutter build apk --debug
+        run: flutter build apk --debug --verbose
         working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
+        timeout-minutes: 30
 
       # Optional: Build Android App Bundle (Release)
       # - name: Build Android App Bundle (Release)
