@@ -6,13 +6,12 @@ import 'package:flutter_dashboard_app/src/features/dashboard/widgets/webradio_da
 import 'package:flutter_dashboard_app/src/models/dashboard_item.dart';
 import 'package:flutter_dashboard_app/src/models/notepad_data.dart';
 import 'package:flutter_dashboard_app/src/models/widget_configs/rss_widget_config.dart';
-import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart'; // For selecting RSS feed
+import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart';
 import 'package:flutter_dashboard_app/src/services/dashboard_service.dart';
-import 'package:flutter_dashboard_app/src/services/rss_service.dart'; // For fetching RSS sources
+import 'package:flutter_dashboard_app/src/services/rss_service.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 
 class DashboardScreen extends StatefulWidget {
-  // For test injection
   final DashboardService? _dashboardServiceForTest;
   final RssService? _rssServiceForTest;
 
@@ -20,8 +19,8 @@ class DashboardScreen extends StatefulWidget {
     super.key,
     DashboardService? dashboardServiceForTest,
     RssService? rssServiceForTest,
-  }) : _dashboardServiceForTest = dashboardServiceForTest,
-       _rssServiceForTest = rssServiceForTest;
+  })  : _dashboardServiceForTest = dashboardServiceForTest,
+        _rssServiceForTest = rssServiceForTest;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -41,16 +40,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboardItems();
   }
 
-  // Methods like _loadDashboardItems, _addInitialItems, etc. remain the same as the correct version from read_files output
-  // ... (assuming the rest of the methods from the read_files output are here and correct) ...
   Future<void> _loadDashboardItems() async {
-    if(mounted) setState(() { _isLoading = true; });
+    if (mounted) setState(() => _isLoading = true);
     _dashboardItems = _dashboardService.getDashboardItems();
     if (_dashboardItems.isEmpty) {
       await _addInitialItems();
-       _dashboardItems = _dashboardService.getDashboardItems();
+      _dashboardItems = _dashboardService.getDashboardItems();
     }
-    if(mounted) setState(() { _isLoading = false; });
+    if (mounted) setState(() => _isLoading = false);
   }
 
   Future<void> _addInitialItems() async {
@@ -60,7 +57,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (sources.isNotEmpty) {
       await _dashboardService.createAndSaveRssWidgetConfigItem(
         2,
-        RssWidgetConfig(feedSourceId: sources.first.id, feedSourceName: sources.first.name ?? sources.first.url)
+        RssWidgetConfig(
+          feedSourceId: sources.first.id,
+          feedSourceName: sources.first.name ?? sources.first.url,
+        ),
       );
     }
     await _dashboardService.createAndSaveWebRadioStatusItem(3);
@@ -79,9 +79,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _addRssSummaryWidget() async {
     List<RssFeedSource> sources = _rssService.getFeedSources();
     if (sources.isEmpty) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No RSS feeds available. Add some in the RSS tab first.')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No RSS feeds available. Add some in the RSS tab first.')),
+        );
+      }
       return;
     }
 
@@ -156,8 +158,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         break;
       case 'placeholder':
       default:
-        content = const PlaceholderWidget();
+        content = PlaceholderWidget(); // <- ✅ Correction ici
     }
+
     return Stack(
       key: ValueKey(item.id),
       children: [
@@ -206,7 +209,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _dashboardItems.isEmpty
-              ? Center(child: Text('No items on dashboard. Add some!', style: Theme.of(context).textTheme.bodyLarge))
+              ? Center(
+                  child: Text(
+                    'No items on dashboard. Add some!',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                )
               : ReorderableGridView.builder(
                   padding: const EdgeInsets.all(8.0),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
