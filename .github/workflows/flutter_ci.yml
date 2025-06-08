@@ -1,0 +1,81 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main ] # Or your primary branch, e.g., master
+  pull_request:
+    branches: [ main ] # Or your primary branch
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build_and_test:
+    name: Build Flutter App & Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          # cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+        working-directory: ./
+
+      # Optional: Check formatting
+      # - name: Check formatting
+      #   run: dart format --output=none --set-exit-if-changed .
+      #   working-directory: ./
+
+      # Optional: Analyze code
+      # - name: Analyze code
+      #   run: flutter analyze
+      #   working-directory: ./
+
+      - name: Generate files (if any)
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+        working-directory: ./
+
+      - name: Run unit and widget tests
+        run: flutter test
+        working-directory: ./
+
+      # Integration tests require an emulator or device, which is more complex for CI.
+      # - name: Run integration tests (Placeholder - requires emulator/device setup)
+      #   run: |
+      #     echo "Integration test execution would go here."
+      #     # flutter test integration_test
+      #   working-directory: ./
+
+      - name: Build Android APK (Debug)
+        run: flutter build apk --debug
+        working-directory: ./
+
+      # Optional: Build Android App Bundle (Release)
+      # - name: Build Android App Bundle (Release)
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   run: |
+      #     echo "Release build would go here."
+      #     # flutter build appbundle --release
+      #   working-directory: ./
+
+      - name: Upload APK Artifact (Debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk # Path is relative to workspace root by default
+          # working-directory is not applicable to `uses` steps directly in this way for path context,
+          # path for upload-artifact is relative to GITHUB_WORKSPACE
+          # If build output was in a subdirectory, path would be e.g. ./flutter_dashboard_app/build/...
+          # But flutter build commands run with working-directory: ./ will output relative to that,
+          # so build/app/... is correct from GITHUB_WORKSPACE.

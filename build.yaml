@@ -1,0 +1,13 @@
+targets:
+  $default:
+    builders:
+      mockito|mockBuilder:
+        options:
+          build_extensions: # Correct key for build_extensions
+            ".dart": [".mocks.dart"]
+      # Potentially other builders like hive_generator if needed to be explicit,
+      # but usually Flutter's build system handles them.
+      # hive_generator|hive_generator_builder:
+      #   options:
+      #     build_extensions:
+      #       ".dart": [".g.dart"]
