@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./flutter_dashboard_app # Updated default
+        working-directory: ./flutter_dashboard_app # Confirmed job-level default
 
     steps:
       - name: Checkout code
@@ -31,42 +31,42 @@ jobs:
           channel: 'stable'
           # cache: true
 
-      - name: List files in workspace (before pub get)
-        run: ls -la flutter_dashboard_app # Adjusted to list inside the project dir
-        # This will use the job default working-directory, but ls target is specified
+      - name: List files in Flutter project directory (before pub get) # Renamed
+        run: ls -la # Changed command, relies on job-level working-directory
+        # No working-directory here
 
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: ./flutter_dashboard_app # Updated
+        working-directory: ./flutter_dashboard_app # Confirmed
 
       # Optional: Check formatting
       # - name: Check formatting
       #   run: dart format --output=none --set-exit-if-changed .
-      #   working-directory: ./flutter_dashboard_app # Updated
+      #   working-directory: ./flutter_dashboard_app # Confirmed
 
       # Optional: Analyze code
       # - name: Analyze code
       #   run: flutter analyze
-      #   working-directory: ./flutter_dashboard_app # Updated
+      #   working-directory: ./flutter_dashboard_app # Confirmed
 
       - name: Generate files (if any)
         run: flutter pub run build_runner build --delete-conflicting-outputs
-        working-directory: ./flutter_dashboard_app # Updated
+        working-directory: ./flutter_dashboard_app # Confirmed
 
       - name: Run unit and widget tests
         run: flutter test
-        working-directory: ./flutter_dashboard_app # Updated
+        working-directory: ./flutter_dashboard_app # Confirmed
 
       # Integration tests require an emulator or device, which is more complex for CI.
       # - name: Run integration tests (Placeholder - requires emulator/device setup)
       #   run: |
       #     echo "Integration test execution would go here."
       #     # flutter test integration_test
-      #   working-directory: ./flutter_dashboard_app # Updated
+      #   working-directory: ./flutter_dashboard_app # Confirmed
 
       - name: Build Android APK (Debug)
         run: flutter build apk --debug
-        working-directory: ./flutter_dashboard_app # Updated
+        working-directory: ./flutter_dashboard_app # Confirmed
 
       # Optional: Build Android App Bundle (Release)
       # - name: Build Android App Bundle (Release)
@@ -74,11 +74,11 @@ jobs:
       #   run: |
       #     echo "Release build would go here."
       #     # flutter build appbundle --release
-      #   working-directory: ./flutter_dashboard_app # Updated
+      #   working-directory: ./flutter_dashboard_app # Confirmed
 
       - name: Upload APK Artifact (Debug)
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-debug.apk # Updated path
-          # This path is now relative to GITHUB_WORKSPACE, and the APK is inside flutter_dashboard_app
+          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-debug.apk
+          # Path is relative to GITHUB_WORKSPACE
