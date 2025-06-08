@@ -11,6 +11,9 @@ jobs:
   build_and_test:
     name: Build Flutter App & Run Tests
     runs-on: ubuntu-latest
+    defaults: # Added job-level default
+      run:
+        working-directory: ./
 
     steps:
       - name: Checkout code
@@ -28,9 +31,13 @@ jobs:
           channel: 'stable'
           # cache: true
 
+      - name: List files in workspace (before pub get)
+        run: ls -la
+        # This will use the job default working-directory: ./
+
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: ./
+        working-directory: ./ # Explicit still here, but should align with default
 
       # Optional: Check formatting
       # - name: Check formatting
@@ -73,9 +80,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: build/app/outputs/flutter-apk/app-debug.apk # Path is relative to workspace root by default
-          # working-directory is not applicable to `uses` steps directly in this way for path context,
-          # path for upload-artifact is relative to GITHUB_WORKSPACE
-          # If build output was in a subdirectory, path would be e.g. ./flutter_dashboard_app/build/...
-          # But flutter build commands run with working-directory: ./ will output relative to that,
-          # so build/app/... is correct from GITHUB_WORKSPACE.
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          # working-directory not applicable to 'uses' steps for path context
+          # path is relative to GITHUB_WORKSPACE.
+          # Since build commands use working-directory: ./ (project root),
+          # this path should be correct from GITHUB_WORKSPACE.
