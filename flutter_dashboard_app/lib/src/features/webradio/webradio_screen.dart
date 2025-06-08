@@ -1,40 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dashboard_app/src/models/radio_station.dart';
+import 'package:flutter_dashboard_app/src/models/favorite_station.dart'; // Added import
 import 'package:flutter_dashboard_app/src/services/radio_service.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:async'; // For StreamSubscription
+// MediaItem is part of just_audio.dart via just_audio_platform_interface
+// No need for separate just_audio_background import for MediaItem model itself.
+import 'dart:async';
 
-// Make AudioPlayer and current station accessible (simplification for now)
-// In a real app, use a proper state management solution (Provider, Riverpod, BLoC)
-// or a dedicated audio service.
+// GlobalRadioState (simplified for now, better state management is ideal)
 class GlobalRadioState {
   static final AudioPlayer audioPlayer = AudioPlayer();
   static RadioStation? currentStation;
   static PlayerState? playerState;
 
-  // Notification Channel details (Required for just_audio background notifications)
   static const String androidNotificationChannelId = 'com.example.flutter_dashboard_app.channel.audio';
   static const String androidNotificationChannelName = 'Flutter Dashboard App Audio';
-  static const String androidNotificationIcon = 'mipmap/ic_launcher'; // Default Flutter icon
+  static const String androidNotificationIcon = 'mipmap/ic_launcher';
+
   static final StreamController<RadioStation?> _currentStationController = StreamController.broadcast();
   static final StreamController<PlayerState?> _playerStateController = StreamController.broadcast();
 
   static Stream<RadioStation?> get currentStationStream => _currentStationController.stream;
   static Stream<PlayerState?> get playerStateStream => _playerStateController.stream;
 
-
   static void setCurrentStation(RadioStation? station) {
     currentStation = station;
-    _currentStationController.add(station);
+    if (!_currentStationController.isClosed) {
+      _currentStationController.add(station);
+    }
   }
 
   static void setPlayerState(PlayerState? state) {
     playerState = state;
-    _playerStateController.add(state);
+     if (!_playerStateController.isClosed) {
+      _playerStateController.add(state);
+    }
   }
 
-  // Ensure dispose is called if the app is fully closing, though this is tricky with static.
-  // For now, WebRadioScreen will handle its own instance's player state stream.
+  // Call this when app is fully closing if possible, though tricky with static.
+  static void dispose() {
+    _currentStationController.close();
+    _playerStateController.close();
+    audioPlayer.dispose(); // Dispose the main player
+  }
 }
 
 
@@ -47,15 +55,14 @@ class WebRadioScreen extends StatefulWidget {
 
 class _WebRadioScreenState extends State<WebRadioScreen> {
   final RadioService _radioService = RadioService();
-  // Use the static AudioPlayer instance
   final AudioPlayer _audioPlayer = GlobalRadioState.audioPlayer;
   final TextEditingController _searchController = TextEditingController();
 
-  List<RadioStation> _apiStations = []; // Stations fetched from API
-  List<FavoriteStation> _favoriteStations = []; // Loaded from Hive
+  List<RadioStation> _apiStations = [];
+  List<FavoriteStation> _favoriteStations = [];
   bool _isLoadingStations = false;
   bool _isSearching = false;
-  bool _showFavorites = false; // Toggle state
+  bool _showFavorites = false;
 
   StreamSubscription<PlayerState>? _playerStateSubscription;
 
@@ -75,13 +82,14 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
   void dispose() {
     _searchController.dispose();
     _playerStateSubscription?.cancel();
+    // GlobalRadioState.dispose(); // Do not dispose static resources here per screen. Manage globally.
     super.dispose();
   }
 
   Future<void> _loadInitialData() async {
-    await _loadFavorites(); // Load favorites first
+    await _loadFavorites();
     if (!_showFavorites) {
-      await _fetchInitialApiStations(); // Then load API stations if not showing favs
+      await _fetchInitialApiStations();
     }
   }
 
@@ -92,7 +100,6 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
   }
 
   Future<void> _fetchInitialApiStations() async {
-    // Fetch some popular stations by default if not in favorite view
     await _searchApiStations(term: "jazz");
   }
 
@@ -137,48 +144,29 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
       return;
     }
     try {
-      await _audioPlayer.stop(); // Stop previous before playing new
+      await _audioPlayer.stop();
 
-      // Create an AudioSource with metadata for the notification
       final audioSource = AudioSource.uri(
         Uri.parse(station.urlResolved),
-        tag: MediaItem( // Used by just_audio for notification
+        tag: MediaItem(
           id: station.stationuuid,
           title: station.name,
-          artist: station.country ?? station.tags.join(', '),
+          artist: station.countryDisplay, // Use countryDisplay
           artUri: station.favicon != null && station.favicon!.isNotEmpty ? Uri.parse(station.favicon!) : null,
-          // For background playback notification configuration
           androidBrowsable: true,
         ),
       );
-      // await _audioPlayer.setAudioSource(audioSource); // This is the new way
-      // Configure just_audio for background playback notification
-      // Note: The setAudioSource should handle this with the MediaItem.
-      // However, explicit configuration might be needed if not using audio_service package directly.
-      // For now, relying on MediaItem within AudioSource.uri
-      await _audioPlayer.setAudioSource(
-        audioSource,
-        // These are important for just_audio's default notification handling
-        // and for background audio behavior on Android.
-        // This might be automatically picked up by newer just_audio versions from the manifest if AudioService is declared.
-        // but explicitly setting them here if they were part of an older API or for clarity.
-        // For modern just_audio, the MediaItem within AudioSource is the primary way.
-        // Let's ensure the MediaItem is correctly populated.
-        // The below might be redundant if MediaItem is fully utilized by just_audio's notification system.
-        // androidNotificationChannelId: GlobalRadioState.androidNotificationChannelId,
-        // androidNotificationChannelName: GlobalRadioState.androidNotificationChannelName,
-        // androidNotificationIcon: GlobalRadioState.androidNotificationIcon, // e.g. 'mipmap/ic_launcher'
-      );
+      await _audioPlayer.setAudioSource(audioSource);
 
       _audioPlayer.play();
-      GlobalRadioState.setCurrentStation(station); // Update global state
-      if (mounted) setState(() {}); // Update local UI if needed (e.g. selected item)
+      GlobalRadioState.setCurrentStation(station);
+      if (mounted) setState(() {});
     } catch (e) {
       print("Error playing station: $e");
       if(mounted) ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error playing station: ${e.toString()}')),
       );
-      GlobalRadioState.setCurrentStation(null); // Clear global current station
+      GlobalRadioState.setCurrentStation(null);
       if (mounted) setState(() {});
     }
   }
@@ -189,25 +177,22 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
 
   Future<void> _stopStation() async {
     await _audioPlayer.stop();
-    GlobalRadioState.setCurrentStation(null); // Clear global current station
+    GlobalRadioState.setCurrentStation(null);
     if (mounted) setState(() {});
   }
 
-  @override
   Future<void> _toggleFavorite(RadioStation station) async {
     if (_radioService.isFavorite(station.stationuuid)) {
       await _radioService.removeFavorite(station.stationuuid);
     } else {
       await _radioService.addFavorite(station);
     }
-    // Refresh favorite list if currently shown, and update isFavorite state for icons
     await _loadFavorites();
-    setState(() {}); // Rebuild to update icons and potentially list
+    setState(() {});
   }
 
   List<RadioStation> get _displayedStations {
     if (_showFavorites) {
-      // Convert FavoriteStation list to RadioStation list for display consistency
       return _favoriteStations.map((fav) => RadioStation(
         stationuuid: fav.stationuuid,
         name: fav.name,
@@ -215,7 +200,14 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
         country: fav.country,
         favicon: fav.favicon,
         tags: fav.tags ?? [],
-        isFavorite: true, // Explicitly mark as favorite
+        isFavorite: true,
+        // Ensure other fields of RadioStation are populated if needed for display/consistency
+        countryCode: fav.country, // Assuming country can serve as countryCode if not distinct in FavoriteStation
+        state: '', // FavoriteStation doesn't have state, default to empty or fetch if critical
+        votes: 0, // FavoriteStation doesn't store votes, default or fetch
+        language: '',// FavoriteStation doesn't store language
+        codec: '',
+        bitrate: 0,
       )).toList();
     }
     return _apiStations;
@@ -228,7 +220,7 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
     ProcessingState? processingState = GlobalRadioState.playerState?.processingState;
     bool isBuffering = processingState == ProcessingState.buffering ||
                        processingState == ProcessingState.loading;
-    bool hasError = processingState == ProcessingState.error;
+    bool hasError = processingState == ProcessingState.error; // Corrected usage
     RadioStation? currentStation = GlobalRadioState.currentStation;
     final stationsToDisplay = _displayedStations;
 
@@ -237,15 +229,15 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
         title: const Text('Web Radio'),
         actions: [
           FilterChip(
-            label: Text(_showFavorites ? 'Favorites' : 'All Stations', style: Theme.of(context).textTheme.labelLarge), // Themed label
+            label: Text(_showFavorites ? 'Favorites' : 'All Stations', style: Theme.of(context).textTheme.labelLarge),
             selected: _showFavorites,
             onSelected: (selected) {
               setState(() {
                 _showFavorites = selected;
                 if (!_showFavorites && _apiStations.isEmpty) {
-                  _fetchInitialApiStations(); // Fetch API stations if switching to all and list is empty
+                  _fetchInitialApiStations();
                 } else if (_showFavorites) {
-                  _loadFavorites(); // Ensure favorites are up-to-date when switching
+                  _loadFavorites();
                 }
               });
             },
@@ -256,8 +248,8 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
       ),
       body: Column(
         children: [
-          if (!_showFavorites) _buildSearchField(), // Only show search for All Stations
-          _buildPlaybackControls(isPlaying, isBuffering),
+          if (!_showFavorites) _buildSearchField(),
+          _buildPlaybackControls(isPlaying, isBuffering, hasError, currentStation), // Added hasError
           if (_isLoadingStations)
             const Expanded(child: Center(child: CircularProgressIndicator()))
           else if (stationsToDisplay.isEmpty)
@@ -301,7 +293,7 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
 
   Widget _buildPlaybackControls(bool isPlaying, bool isBuffering, bool hasError, RadioStation? currentStation) {
     return Card(
-      key: const ValueKey('webradio_player_controls'), // Added ValueKey here
+      key: const ValueKey('webradio_player_controls'),
       margin: const EdgeInsets.all(8.0),
       elevation: currentStation != null || hasError ? 2.0 : 0.5,
       child: Padding(
@@ -313,8 +305,8 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
               currentStation?.name ?? (hasError ? 'Playback Error' : 'No station selected'),
               style: (currentStation != null || hasError
                   ? Theme.of(context).textTheme.titleMedium
-                  : Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
-              color: hasError ? Theme.of(context).colorScheme.error : null,
+                  : Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey))
+                ?.copyWith(color: hasError ? Theme.of(context).colorScheme.error : null), // Corrected text color
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
@@ -337,14 +329,13 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
             const SizedBox(height: 8),
             if (isBuffering)
               const Center(child: CircularProgressIndicator())
-            else if (!hasError) // Only show buttons if no error
+            else if (!hasError)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.play_arrow),
                     iconSize: 36.0,
-                    // Enable play only if a station is selected AND it's not already playing
                     onPressed: currentStation == null || isPlaying ? null : () => _playStation(currentStation),
                     tooltip: 'Play',
                   ),
@@ -395,7 +386,7 @@ class _WebRadioScreenState extends State<WebRadioScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(station.votes != null ? '${station.votes?.toInt()}' : '', style: Theme.of(context).textTheme.bodySmall), // Themed votes
+                Text(station.votes != null ? '${station.votes?.toInt()}' : '', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(width: 4),
                 IconButton(
                   icon: Icon(isFav ? Icons.star : Icons.star_border, color: isFav ? Colors.amber : Theme.of(context).colorScheme.onSurfaceVariant),
