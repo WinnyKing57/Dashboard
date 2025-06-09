@@ -43,3 +43,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+dependency_overrides:
+  xml: ^6.1.0
