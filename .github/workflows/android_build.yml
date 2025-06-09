@@ -27,10 +27,6 @@ jobs:
         with:
           channel: 'stable' # Or your preferred channel
 
-      - name: Set Gradle version
-        working-directory: ./flutter_dashboard_app/android
-        run: ./gradlew wrapper --gradle-version 8.9 --distribution-type all
-
       - name: Upgrade Flutter dependencies
         working-directory: ./flutter_dashboard_app
         run: flutter pub upgrade --major-versions
@@ -38,6 +34,10 @@ jobs:
       - name: Regenerate Android project
         working-directory: ./flutter_dashboard_app
         run: flutter create . --platforms android
+
+      - name: Set Gradle version
+        working-directory: ./flutter_dashboard_app/android
+        run: ./gradlew wrapper --gradle-version 8.9 --distribution-type all
 
       - name: Get Flutter dependencies
         working-directory: ./flutter_dashboard_app
