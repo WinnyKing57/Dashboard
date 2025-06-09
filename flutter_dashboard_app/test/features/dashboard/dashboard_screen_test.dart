@@ -305,8 +305,11 @@ void main() {
 
     expect(find.byType(PlaceholderWidget), findsOneWidget);
 
-    // Find the delete button using byKey for the parent Stack and byTooltip for the button
-    final stackFinder = find.byKey(ValueKey(itemToDelete.id));
+    // Find the delete button using byWidgetPredicate for the parent Stack and byTooltip for the button
+    final stackFinder = find.byWidgetPredicate(
+      (widget) => widget is Stack && widget.key == ValueKey(itemToDelete.id),
+      description: 'Stack with key ${itemToDelete.id}',
+    );
     expect(stackFinder, findsOneWidget, reason: 'Should find the Stack for the item to be deleted');
 
     final deleteButton = find.descendant(
