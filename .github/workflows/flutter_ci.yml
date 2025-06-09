@@ -1,4 +1,4 @@
-name: Flutter CI with New Project Setup
+name: Flutter CI
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build Flutter App with New Project
+    name: Build Flutter App
     runs-on: ubuntu-latest
 
     steps:
@@ -27,31 +27,18 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Create new Flutter project
-        run: flutter create --template app new_flutter_project
-
-      - name: Copy essential files to new project
-        run: |
-          # Copy lib directory
-          cp -r flutter_dashboard_app/lib new_flutter_project/
-          # Copy assets directory if it exists
-          if [ -d "flutter_dashboard_app/assets" ]; then
-            cp -r flutter_dashboard_app/assets new_flutter_project/
-          fi
-          # Copy pubspec.yaml
-          cp flutter_dashboard_app/pubspec.yaml new_flutter_project/
+      - name: Regenerate Android platform files
+        run: flutter create --platforms android .
 
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: new_flutter_project
 
       - name: Build Android APK (Debug)
         run: flutter build apk --debug --verbose
-        working-directory: new_flutter_project
         timeout-minutes: 30
 
       - name: Upload APK Artifact (Debug)
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          path: new_flutter_project/build/app/outputs/flutter-apk/app-debug.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
