@@ -278,9 +278,9 @@ void main() {
     await tester.tap(find.text('Feed 1')); // Select the feed
     await tester.pumpAndSettle(); // Dialog closes, widget is added
 
-    // Initial items: Placeholder(0), Notepad(1), WebRadio(2). New RSS Widget is order 3.
+    // Initial items: Placeholder(0), Notepad(1), Initial RSS(2), WebRadio(3). New RSS Widget is order 4.
     // The config passed to createAndSaveRssWidgetConfigItem will be based on sourceToSave.
-    verify(mockDashboardService.createAndSaveRssWidgetConfigItem(3, argThat(isA<RssWidgetConfig>().having((w) => w.feedSourceId, 'feedSourceId', 'rss1')))).called(1);
+    verify(mockDashboardService.createAndSaveRssWidgetConfigItem(4, argThat(isA<RssWidgetConfig>().having((w) => w.feedSourceId, 'feedSourceId', 'rss1')))).called(1);
 
     // We expect the RssDashboardWidget to be on screen
     expect(find.byType(RssDashboardWidget), findsOneWidget);
