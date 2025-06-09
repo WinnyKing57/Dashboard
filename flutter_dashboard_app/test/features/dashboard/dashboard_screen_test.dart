@@ -319,7 +319,8 @@ void main() {
     expect(deleteButton, findsOneWidget);
 
     await tester.tap(deleteButton);
-    await tester.pumpAndSettle(); // Re-renders after deletion
+    await tester.pumpAndSettle(); // Let animations and state changes complete
+    await tester.pump(); // Add extra pump here
 
     verify(mockDashboardService.deleteDashboardItem(itemToDelete.id)).called(1);
     expect(find.byType(PlaceholderWidget), findsNothing); // Widget should be gone
