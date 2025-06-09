@@ -53,7 +53,7 @@ class _RssFeedScreenState extends State<RssFeedScreen> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter a URL';
                 }
-                if (!Uri.tryParse(value)?.hasAbsolutePath ?? true) {
+                if (!(Uri.tryParse(value)?.hasAbsolutePath == true)) {
                   return 'Please enter a valid URL';
                 }
                 return null;
