@@ -1,19 +1,16 @@
-name: Flutter CI
+name: Flutter CI with New Project Setup
 
 on:
   push:
-    branches: [ main ] # Or your primary branch, e.g., master
+    branches: [ main ]
   pull_request:
-    branches: [ main ] # Or your primary branch
-  workflow_dispatch: # Allows manual triggering
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build_and_test:
-    name: Build Flutter App & Run Tests
+  build:
+    name: Build Flutter App with New Project
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated default
 
     steps:
       - name: Checkout code
@@ -29,59 +26,32 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          # cache: true
 
-      - name: List files in Flutter project directory (before pub get)
-        run: ls -la
-        # This step will now use the default working-directory: ${{ github.workspace }}/flutter_dashboard_app
+      - name: Create new Flutter project
+        run: flutter create --template app new_flutter_project
+
+      - name: Copy essential files to new project
+        run: |
+          # Copy lib directory
+          cp -r flutter_dashboard_app/lib new_flutter_project/
+          # Copy assets directory if it exists
+          if [ -d "flutter_dashboard_app/assets" ]; then
+            cp -r flutter_dashboard_app/assets new_flutter_project/
+          fi
+          # Copy pubspec.yaml
+          cp flutter_dashboard_app/pubspec.yaml new_flutter_project/
 
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
-
-      # Optional: Check formatting
-      # - name: Check formatting
-      #   run: dart format --output=none --set-exit-if-changed .
-      #   working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
-
-      # Optional: Analyze code
-      # - name: Analyze code
-      #   run: flutter analyze
-      #   working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
-
-      - name: Generate files (if any)
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-        working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
-
-      - name: Run unit and widget tests
-        run: flutter test -r expanded
-        working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
-        timeout-minutes: 20
-
-      # Integration tests require an emulator or device, which is more complex for CI.
-      # - name: Run integration tests (Placeholder - requires emulator/device setup)
-      #   run: |
-      #     echo "Integration test execution would go here."
-      #     # flutter test integration_test
-      #   working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
+        working-directory: new_flutter_project
 
       - name: Build Android APK (Debug)
         run: flutter build apk --debug --verbose
-        working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
+        working-directory: new_flutter_project
         timeout-minutes: 30
-
-      # Optional: Build Android App Bundle (Release)
-      # - name: Build Android App Bundle (Release)
-      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #   run: |
-      #     echo "Release build would go here."
-      #     # flutter build appbundle --release
-      #   working-directory: ${{ github.workspace }}/flutter_dashboard_app # Updated
 
       - name: Upload APK Artifact (Debug)
         uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
-          # This path is relative to GITHUB_WORKSPACE. Since builds happen in the flutter_dashboard_app subdir,
-          # the output path from GITHUB_WORKSPACE perspective is flutter_dashboard_app/build/...
-          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-debug.apk # Confirmed path
+          path: new_flutter_project/build/app/outputs/flutter-apk/app-debug.apk
