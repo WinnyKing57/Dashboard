@@ -1,10 +1,6 @@
 name: Android Build2
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -25,7 +21,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # Or your preferred channel
+          channel: 'stable'
 
       - name: Upgrade Flutter dependencies
         working-directory: ./flutter_dashboard_app
@@ -39,14 +35,13 @@ jobs:
         working-directory: ./flutter_dashboard_app/android
         run: |
           if [ -f "build.gradle.kts" ]; then
-            sed -i -E 's/(id\("com\.android\.application"\) version ")[^"]+(" apply false)/\18.1.0\2/' build.gradle.kts
+            sed -i -E 's/(id"com\.android\.application" version ")[^"]+(" apply false)/\18.1.0\2/' build.gradle.kts
             echo "Attempted to set AGP version to 8.1.0 in build.gradle.kts"
           elif [ -f "build.gradle" ]; then
-            sed -i -E "s/(classpath 'com\.android\.tools\.build:gradle:)[^']+'/8.1.0'/" build.gradle
+            sed -i -E "s/(classpath 'com\.android\.tools\.build:gradle:)[^']+'/8.1.0'/" build.gradle
             echo "Attempted to set AGP version to 8.1.0 in build.gradle (Groovy)"
           else
             echo "No build.gradle or build.gradle.kts found to set AGP version."
-            # exit 1 # Optionally fail the build if no build file is found
           fi
 
       - name: Set Gradle version
