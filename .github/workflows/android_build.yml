@@ -27,8 +27,9 @@ jobs:
         with:
           channel: 'stable' # Or your preferred channel
 
-      - name: Navigate to Flutter project directory
-        run: cd flutter_dashboard_app
+      - name: Regenerate Android project
+        working-directory: ./flutter_dashboard_app
+        run: flutter create . --platforms android
 
       - name: Get Flutter dependencies
         working-directory: ./flutter_dashboard_app
