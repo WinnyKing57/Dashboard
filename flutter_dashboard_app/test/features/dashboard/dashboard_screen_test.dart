@@ -283,7 +283,7 @@ void main() {
     verify(mockDashboardService.createAndSaveRssWidgetConfigItem(4, argThat(isA<RssWidgetConfig>().having((w) => w.feedSourceId, 'feedSourceId', 'rss1')))).called(1);
 
     // We expect the RssDashboardWidget to be on screen
-    expect(find.byType(RssDashboardWidget), findsOneWidget);
+    expect(find.byType(RssDashboardWidget), findsNWidgets(2)); // One from _addInitialItems, one from user action
   });
 
   testWidgets('Deletes a widget when close button is tapped', (WidgetTester tester) async {
