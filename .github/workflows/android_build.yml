@@ -1,0 +1,50 @@
+name: Android Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Flutter Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Android Gradle plugin compatibility
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable' # Or your preferred channel
+
+      - name: Navigate to Flutter project directory
+        run: cd flutter_dashboard_app
+
+      - name: Get Flutter dependencies
+        working-directory: ./flutter_dashboard_app
+        run: flutter pub get
+
+      - name: Generate files
+        working-directory: ./flutter_dashboard_app
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build Android APK (Release)
+        working-directory: ./flutter_dashboard_app
+        run: flutter build apk --release --verbose
+        timeout-minutes: 30
+
+      - name: Upload APK Artifact (Release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-release.apk

@@ -44,7 +44,7 @@ void main() async {
   await Hive.openBox<FavoriteStation>('favoriteStationsBox');
 
   // Initialise les notifications (fonction à définir)
-  await initializeNotifications();
+  // await initializeNotifications();
 
   // Initialise Workmanager pour les tâches en arrière-plan
   await Workmanager().initialize(
