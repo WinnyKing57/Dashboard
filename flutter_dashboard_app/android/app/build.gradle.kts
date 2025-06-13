@@ -1,3 +1,9 @@
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = java.util.Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+}
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flutter_dashboard_app"
+    namespace = "com.jules.flutter_dashboard_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -22,7 +28,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.flutter_dashboard_app"
+        applicationId = "com.jules.flutter_dashboard_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -31,12 +37,22 @@ android {
         versionName = flutter.versionName
         multiDexEnabled = true
     }
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as String? ?: System.getenv("KEY_ALIAS")
+            keyPassword = keystoreProperties["keyPassword"] as String? ?: System.getenv("KEY_PASSWORD")
+            storeFile = keystoreProperties["storeFile"]?.let { rootProject.file(it) } ?: System.getenv("STORE_FILE")?.let { rootProject.file(it) }
+            storePassword = keystoreProperties["storePassword"] as String? ?: System.getenv("STORE_PASSWORD")
+        }
+    }
+
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false // Or true if you want to enable it
+            // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") // Uncomment if you have a proguard-rules.pro
+
         }
     }
 }
