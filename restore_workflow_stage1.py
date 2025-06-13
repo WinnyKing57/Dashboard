@@ -1,4 +1,11 @@
-name: Android Build - Step Restore 1
+# Python script to update .github/workflows/android_build.yml
+# with the first set of restored steps.
+
+import os
+
+workflow_file_path = ".github/workflows/android_build.yml"
+
+restored_workflow_content_stage1 = '''name: Android Build - Step Restore 1
 
 on:
   push:
@@ -28,3 +35,11 @@ jobs:
 
       - name: Test command after initial setup
         run: echo "Initial setup steps (Java, Flutter) completed."
+'''
+
+try:
+    with open(workflow_file_path, "w") as f:
+        f.write(restored_workflow_content_stage1)
+    print(f"Successfully updated {workflow_file_path} with initial restored steps (Checkout, Java, Flutter).")
+except Exception as e:
+    print(f"Error writing restored workflow (stage 1) to {workflow_file_path}: {e}")
