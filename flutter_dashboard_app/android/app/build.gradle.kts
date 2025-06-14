@@ -1,11 +1,5 @@
 import java.util.Properties
 
-val keystorePropertiesFile = rootProject.file("keystore.properties")
-val keystoreProperties = java.util.Properties()
-if (keystorePropertiesFile.exists()) {
-    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
-}
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -39,6 +33,13 @@ android {
         versionName = flutter.versionName
         multiDexEnabled = true
     }
+
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = java.util.Properties()
+    if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+    }
+
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String? ?: System.getenv("KEY_ALIAS")
