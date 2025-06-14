@@ -1,3 +1,4 @@
+import java.util.Properties
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = java.util.Properties()
 if (keystorePropertiesFile.exists()) {
