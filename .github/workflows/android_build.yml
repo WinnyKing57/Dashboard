@@ -30,9 +30,6 @@ jobs:
         working-directory: ./flutter_dashboard_app
         run: flutter pub upgrade --major-versions
 
-      - name: Regenerate Android project
-        working-directory: ./flutter_dashboard_app
-        run: flutter create . --platforms android
 
       - name: Set Gradle version
         working-directory: ./flutter_dashboard_app/android
