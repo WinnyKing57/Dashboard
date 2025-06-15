@@ -31,6 +31,11 @@ jobs:
         run: flutter pub upgrade --major-versions
 
 
+      - name: List files in android directory
+        working-directory: ./flutter_dashboard_app/android
+        run: |
+          echo "Listing files in $(pwd):"
+          ls -la
       - name: Set Gradle version
         working-directory: ./flutter_dashboard_app/android
         run: ./gradlew wrapper --gradle-version 8.9 --distribution-type all
