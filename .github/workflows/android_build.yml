@@ -1,12 +1,84 @@
-# .github/workflows/test.yml
-name: Test Trigger
+name: Android Build
 
 on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  test:
+  build:
+    name: Build Flutter Android App
     runs-on: ubuntu-latest
     steps:
-      - name: Echo
-        run: echo "✅ GitHub Actions works!"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Upgrade Flutter dependencies
+        working-directory: ./flutter_dashboard_app
+        run: flutter pub upgrade --major-versions
+
+      - name: Regenerate Android project
+        working-directory: ./flutter_dashboard_app
+        run: flutter create . --platforms android
+
+      - name: Set Gradle version
+        working-directory: ./flutter_dashboard_app/android
+        run: ./gradlew wrapper --gradle-version 8.9 --distribution-type all
+
+      - name: Get Flutter dependencies
+        working-directory: ./flutter_dashboard_app
+        run: flutter pub get
+
+      - name: Generate files
+        working-directory: ./flutter_dashboard_app
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: Clean Android build
+        working-directory: ./flutter_dashboard_app/android
+        run: ./gradlew clean
+
+#      - name: Create keystore.properties
+#        if: |
+#          secrets.RELEASE_STORE_PASSWORD != null &&
+#          secrets.RELEASE_KEY_ALIAS != null &&
+#          secrets.RELEASE_KEY_PASSWORD != null &&
+#          secrets.RELEASE_STORE_FILE_BASE64 != null
+#        working-directory: ./flutter_dashboard_app/android
+#        run: |
+#          echo "storeFile=my-release-key.keystore" > keystore.properties
+#          echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
+#          echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
+#          echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
+
+#      - name: Decode Keystore
+#        if: |
+#          secrets.RELEASE_STORE_PASSWORD != null &&
+#          secrets.RELEASE_KEY_ALIAS != null &&
+#          secrets.RELEASE_KEY_PASSWORD != null &&
+#          secrets.RELEASE_STORE_FILE_BASE64 != null
+#        working-directory: ./flutter_dashboard_app/android
+#        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
+
+#      - name: Build Android APK (Release)
+#        working-directory: ./flutter_dashboard_app
+#        run: flutter build apk --release --verbose
+#        timeout-minutes: 30
+
+#      - name: Upload APK Artifact (Release)
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: app-release.apk
+#          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-release.apk
