@@ -72,13 +72,13 @@ jobs:
         working-directory: ./flutter_dashboard_app/android
         run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
 
-#      - name: Build Android APK (Release)
-#        working-directory: ./flutter_dashboard_app
-#        run: flutter build apk --release --verbose
-#        timeout-minutes: 30
+      - name: Build Android APK (Release)
+        working-directory: ./flutter_dashboard_app
+        run: flutter build apk --release --verbose
+        timeout-minutes: 30
 
-#      - name: Upload APK Artifact (Release)
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-release.apk
-#          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-release.apk
+      - name: Upload APK Artifact (Release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-release.apk
