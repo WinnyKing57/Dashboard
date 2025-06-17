@@ -42,15 +42,15 @@ android {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String? ?: System.getenv("KEY_ALIAS")
             keyPassword = keystoreProperties["keyPassword"] as String? ?: System.getenv("KEY_PASSWORD")
-            storeFile = keystoreProperties["storeFile"]?.let { rootProject.file(it) } ?: System.getenv("STORE_FILE")?.let { rootProject.file(it) }
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) } ?: System.getenv("STORE_FILE")?.let { rootProject.file(it) }
             storePassword = keystoreProperties["storePassword"] as String? ?: System.getenv("STORE_PASSWORD")
         }
     }
 
     buildTypes {
         release {
-            signingConfig.set(signingConfigs.getByName("release"))
-            isMinifyEnabled.set(false) // Or .set(true) if preferred
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false // Or .set(true) if preferred
             // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
