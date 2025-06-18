@@ -75,6 +75,7 @@ jobs:
 #        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
 
       - name: Build Android APK (Debug)
+        working-directory: ./flutter_dashboard_app
         run: flutter build apk --debug
 #        run: flutter build apk --release --verbose
 #        timeout-minutes: 30
