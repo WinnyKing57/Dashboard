@@ -120,61 +120,50 @@ class _RssFeedScreenState extends State<RssFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('RSS Feed Sources'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () async {
-              setState(() { _isLoading = true; });
-              await _rssService.refreshAllFeeds();
-              _loadFeedSources(); // Reload sources
-              if (mounted) { // Check if the widget is still in the tree
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('All feeds refreshed.')),
-                );
-              }
-            },
-            tooltip: 'Refresh All Feeds',
+    final Widget bodyContent = _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _feedSources.isEmpty
+            ? Center(child: Text('No feed sources. Add some!', style: Theme.of(context).textTheme.bodyLarge))
+            : ListView.builder(
+                itemCount: _feedSources.length,
+                itemBuilder: (context, index) {
+                  final source = _feedSources[index];
+                  return Slidable(
+                    key: ValueKey(source.id),
+                    endActionPane: ActionPane(
+                      motion: const StretchMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) => _removeFeedSource(source.id),
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          icon: Icons.delete,
+                          label: 'Delete',
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      title: Text(source.name ?? 'Unnamed Feed'),
+                      subtitle: Text(source.url),
+                      onTap: () => _navigateToFeedItems(source),
+                    ),
+                  );
+                },
+              );
+
+    return Stack(
+      children: [
+        bodyContent,
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton(
+            onPressed: _addFeedSourceDialog,
+            tooltip: 'Add Feed Source',
+            child: const Icon(Icons.add),
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _feedSources.isEmpty
-              ? Center(child: Text('No feed sources. Add some!', style: Theme.of(context).textTheme.bodyLarge))
-              : ListView.builder(
-                  itemCount: _feedSources.length,
-                  itemBuilder: (context, index) {
-                    final source = _feedSources[index];
-                    return Slidable(
-                      key: ValueKey(source.id),
-                      endActionPane: ActionPane(
-                        motion: const StretchMotion(),
-                        children: [
-                          SlidableAction(
-                            onPressed: (context) => _removeFeedSource(source.id),
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                            icon: Icons.delete,
-                            label: 'Delete',
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        title: Text(source.name ?? 'Unnamed Feed'),
-                        subtitle: Text(source.url),
-                        onTap: () => _navigateToFeedItems(source),
-                      ),
-                    );
-                  },
-                ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addFeedSourceDialog,
-        tooltip: 'Add Feed Source',
-        child: const Icon(Icons.add),
-      ),
+        ),
+      ],
     );
   }
 }

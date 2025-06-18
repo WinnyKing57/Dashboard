@@ -5,13 +5,8 @@ class WebRadioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Web Radio'),
-      ),
-      body: const Center(
-        child: Text('Web Radio Screen'),
-      ),
+    return const Center( // Or any other root widget for its content
+      child: Text('Web Radio Screen'),
     );
   }
 }

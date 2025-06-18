@@ -161,6 +161,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
 
   late final List<Widget> _widgetOptions;
+  late final List<String> _screenTitles; // Added screen titles
 
   @override
   void initState() {
@@ -171,8 +172,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const WebRadioScreen(),
       SettingsScreen(
         onThemeChanged: widget.onThemeChanged,
-        onColorSeedChanged: widget.onColorSeedChanged, // Add this line
+        onColorSeedChanged: widget.onColorSeedChanged,
       ),
+    ];
+    _screenTitles = <String>[ // Initialize titles
+      'Dashboard',
+      'RSS Feeds',
+      'Web Radio',
+      'Settings',
     ];
   }
 
@@ -180,22 +187,58 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    Navigator.pop(context); // Close the drawer
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar( // Added AppBar
+        title: Text(_screenTitles[_selectedIndex]),
+      ),
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.rss_feed), label: 'RSS'),
-          BottomNavigationBarItem(icon: Icon(Icons.radio), label: 'Web Radio'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Text(
+                'WinBoard Menu',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontSize: 24,
+                ),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard),
+              title: const Text('Dashboard'),
+              selected: _selectedIndex == 0,
+              onTap: () => _onItemTapped(0),
+            ),
+            ListTile(
+              leading: const Icon(Icons.rss_feed),
+              title: const Text('RSS'),
+              selected: _selectedIndex == 1,
+              onTap: () => _onItemTapped(1),
+            ),
+            ListTile(
+              leading: const Icon(Icons.radio),
+              title: const Text('Web Radio'),
+              selected: _selectedIndex == 2,
+              onTap: () => _onItemTapped(2),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              selected: _selectedIndex == 3,
+              onTap: () => _onItemTapped(3),
+            ),
+          ],
+        ),
       ),
     );
   }

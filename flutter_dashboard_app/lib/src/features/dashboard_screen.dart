@@ -220,53 +220,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'add_notepad') _addNotepadWidget();
-              if (value == 'add_placeholder') _addPlaceholder();
-              if (value == 'add_rss_summary') _addRssSummaryWidget();
-              if (value == 'add_webradio_status') _addWebRadioStatusWidget();
-              if (value == 'add_dynamic_label') _addDynamicLabelWidget();
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(value: 'add_notepad', child: Text('Add Notepad')),
-              const PopupMenuItem<String>(value: 'add_placeholder', child: Text('Add Placeholder')),
-              const PopupMenuItem<String>(value: 'add_rss_summary', child: Text('Add RSS Summary')),
-              const PopupMenuItem<String>(value: 'add_webradio_status', child: Text('Add WebRadio Status')),
-              const PopupMenuItem<String>(value: 'add_dynamic_label', child: Text('Add Dynamic Label')),
-            ],
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _dashboardItems.isEmpty
-              ? Center(
-                  child: Text(
-                    'No items on dashboard. Add some!',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                )
-              : ReorderableGridView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 8.0,
-                    mainAxisSpacing: 8.0,
-                    childAspectRatio: 3 / 2,
-                  ),
-                  itemCount: _dashboardItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _dashboardItems[index];
-                    return _buildWidgetItem(item, context);
-                  },
-                  onReorder: _onReorder,
+    // Removed Scaffold and AppBar. The body is returned directly.
+    // The PopupMenuButton for adding items will need to be moved to MainNavigationScreen's AppBar
+    // or handled via another UI element if dashboard-specific actions are needed.
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _dashboardItems.isEmpty
+            ? Center(
+                child: Text(
+                  'No items on dashboard. Add some!',
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-    );
+              )
+            : ReorderableGridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 8.0,
+                  mainAxisSpacing: 8.0,
+                  childAspectRatio: 3 / 2,
+                ),
+                itemCount: _dashboardItems.length,
+                itemBuilder: (context, index) {
+                  final item = _dashboardItems[index];
+                  return _buildWidgetItem(item, context);
+                },
+                onReorder: _onReorder,
+              );
   }
 }

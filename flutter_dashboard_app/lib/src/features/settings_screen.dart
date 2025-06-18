@@ -116,15 +116,11 @@ class SettingsScreen extends StatelessWidget {
     // This is just for display in the ListTile, MyAppState holds the truth.
     Color currentSeedColorDisplay = Theme.of(context).colorScheme.primary;
 
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.brightness_6),
+    // Removed Scaffold and AppBar. The ListView is returned directly.
+    return ListView(
+      children: <Widget>[
+        ListTile(
+          leading: const Icon(Icons.brightness_6),
             title: const Text('Theme Mode'),
             // Subtitle could show current theme, e.g., "Light", "Dark", "System"
             // This would require getting the actual current ThemeMode from MyAppState
