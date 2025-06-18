@@ -52,36 +52,35 @@ jobs:
         working-directory: ./flutter_dashboard_app/android
         run: ./gradlew clean
 
-#      - name: Create keystore.properties
-#        if: |
-#          secrets.RELEASE_STORE_PASSWORD != null &&
-#          secrets.RELEASE_KEY_ALIAS != null &&
-#          secrets.RELEASE_KEY_PASSWORD != null &&
-#          secrets.RELEASE_STORE_FILE_BASE64 != null
-#        working-directory: ./flutter_dashboard_app/android
-#        run: |
-#          echo "storeFile=my-release-key.keystore" > keystore.properties
-#          echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
-#          echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
-#          echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
+      - name: Create keystore.properties
+        if: |
+          secrets.RELEASE_STORE_PASSWORD != null &&
+          secrets.RELEASE_KEY_ALIAS != null &&
+          secrets.RELEASE_KEY_PASSWORD != null &&
+          secrets.RELEASE_STORE_FILE_BASE64 != null
+        working-directory: ./flutter_dashboard_app/android
+        run: |
+          echo "storeFile=my-release-key.keystore" > keystore.properties
+          echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
+          echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
 
-#      - name: Decode Keystore
-#        if: |
-#          secrets.RELEASE_STORE_PASSWORD != null &&
-#          secrets.RELEASE_KEY_ALIAS != null &&
-#          secrets.RELEASE_KEY_PASSWORD != null &&
-#          secrets.RELEASE_STORE_FILE_BASE64 != null
-#        working-directory: ./flutter_dashboard_app/android
-#        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
+      - name: Decode Keystore
+        if: |
+          secrets.RELEASE_STORE_PASSWORD != null &&
+          secrets.RELEASE_KEY_ALIAS != null &&
+          secrets.RELEASE_KEY_PASSWORD != null &&
+          secrets.RELEASE_STORE_FILE_BASE64 != null
+        working-directory: ./flutter_dashboard_app/android
+        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
 
-      - name: Build Android APK (Debug)
+      - name: Build Android APK (Release)
         working-directory: ./flutter_dashboard_app
-        run: flutter build apk --debug
-#        run: flutter build apk --release --verbose
+        run: flutter build apk --release --verbose
 #        timeout-minutes: 30
 
-      - name: Upload APK Artifact (Debug)
+      - name: Upload APK Artifact (Release)
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug.apk
-          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-debug.apk
+          name: app-release.apk
+          path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-release.apk
