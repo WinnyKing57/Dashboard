@@ -1,4 +1,4 @@
-package com.example.flutter_dashboard_app
+package com.winnyking.winboard
 
 import io.flutter.embedding.android.FlutterActivity
 
