@@ -2,17 +2,22 @@ name: Android Build
 
 on:
   push:
-    branches: [ stable_main ]
+    branches: [stable_main]
   pull_request:
-    branches: [ stable_main ]
+    branches: [stable_main]
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Flutter Android App
+  build_android_release:
+    name: Build Flutter Android APK (Release)
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./flutter_dashboard_app
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -24,62 +29,41 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
 
-      - name: Upgrade Flutter dependencies
-        working-directory: ./flutter_dashboard_app
+      - name: Flutter clean
+        run: flutter clean
+
+      - name: Upgrade dependencies
         run: flutter pub upgrade --major-versions
 
-      - name: Regenerate Android project
-        working-directory: ./flutter_dashboard_app
-        run: flutter create . --platforms android
+      - name: Get Flutter dependencies
+        run: flutter pub get
 
-
+      - name: Generate files (build_runner)
+        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Set Gradle version
         working-directory: ./flutter_dashboard_app/android
         run: ./gradlew wrapper --gradle-version 8.9 --distribution-type all
 
-      - name: Get Flutter dependencies
-        working-directory: ./flutter_dashboard_app
-        run: flutter pub get
-
-      - name: Generate files
-        working-directory: ./flutter_dashboard_app
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-
-      - name: Clean Android build
-        working-directory: ./flutter_dashboard_app/android
-        run: ./gradlew clean
-
-      - name: Create keystore.properties
-        if: |
-          secrets.RELEASE_STORE_PASSWORD != null &&
-          secrets.RELEASE_KEY_ALIAS != null &&
-          secrets.RELEASE_KEY_PASSWORD != null &&
-          secrets.RELEASE_STORE_FILE_BASE64 != null
+      - name: Decode Keystore and Create keystore.properties
+        if: ${{ secrets.RELEASE_STORE_FILE_BASE64 && secrets.RELEASE_STORE_PASSWORD && secrets.RELEASE_KEY_ALIAS && secrets.RELEASE_KEY_PASSWORD }}
         working-directory: ./flutter_dashboard_app/android
         run: |
-          echo "storeFile=my-release-key.keystore" > keystore.properties
-          echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
-          echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
-          echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
+          echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
+          cat <<EOF > keystore.properties
+          storeFile=my-release-key.keystore
+          storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}
+          keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}
+          keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}
+          EOF
 
-      - name: Decode Keystore
-        if: |
-          secrets.RELEASE_STORE_PASSWORD != null &&
-          secrets.RELEASE_KEY_ALIAS != null &&
-          secrets.RELEASE_KEY_PASSWORD != null &&
-          secrets.RELEASE_STORE_FILE_BASE64 != null
-        working-directory: ./flutter_dashboard_app/android
-        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
-
-      - name: Build Android APK (Release)
-        working-directory: ./flutter_dashboard_app
+      - name: Build APK (Release)
         run: flutter build apk --release --verbose
         timeout-minutes: 30
 
-      - name: Upload APK Artifact (Release)
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
