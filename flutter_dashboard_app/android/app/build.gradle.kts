@@ -32,7 +32,7 @@ android {
     }
 
     // Chargement des propriétés de signature
-    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystorePropertiesFile = file("keystore.properties")
     val keystoreProperties = Properties()
     if (keystorePropertiesFile.exists()) {
         keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
@@ -42,8 +42,8 @@ android {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
             keyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-            val storeFileFromProps = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
-            val storeFileFromEnv = System.getenv("STORE_FILE")?.let { rootProject.file(it) }
+            val storeFileFromProps = keystoreProperties.getProperty("storeFile")?.let { file(it) }
+            val storeFileFromEnv = System.getenv("STORE_FILE")?.let { file(it) }
             storeFile = storeFileFromProps ?: storeFileFromEnv
             storePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
         }
