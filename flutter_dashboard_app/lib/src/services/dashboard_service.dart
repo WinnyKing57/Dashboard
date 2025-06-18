@@ -49,6 +49,18 @@ class DashboardService {
     return newItem;
   }
 
+  Future<DashboardItem> createAndSaveDynamicWidgetItem(
+      int order, String widgetType, Map<String, dynamic> configData) async {
+    final newItem = DashboardItem(
+      id: _uuid.v4(),
+      widgetType: widgetType, // e.g., "label"
+      order: order,
+      widgetData: configData, // Store the Map<String, dynamic> directly
+    );
+    await saveDashboardItem(newItem);
+    return newItem;
+  }
+
   Future<DashboardItem> createAndSavePlaceholderItem(int order) async {
     final newItem = DashboardItem(
       id: _uuid.v4(),

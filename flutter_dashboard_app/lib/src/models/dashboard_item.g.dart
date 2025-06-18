@@ -20,7 +20,7 @@ class DashboardItemAdapter extends TypeAdapter<DashboardItem> {
       id: fields[0] as String,
       widgetType: fields[1] as String,
       order: fields[2] as int,
-      widgetData: fields[3] as HiveObject?,
+      widgetData: fields[3] as dynamic,
     );
   }
 

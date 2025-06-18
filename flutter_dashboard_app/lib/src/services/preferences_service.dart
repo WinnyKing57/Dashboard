@@ -22,6 +22,7 @@ class PreferencesService {
         themeModeName: prefs.themeModeName,
         rssNotificationsEnabled: prefs.rssNotificationsEnabled,
         rssRefreshFrequencyHours: prefs.rssRefreshFrequencyHours,
+        colorSeedValue: prefs.colorSeedValue, // Add this line
       );
     }
     return UserPreferences.defaults();
@@ -45,6 +46,12 @@ class PreferencesService {
     await saveUserPreferences(prefs);
     // Note: Re-registering workmanager task should happen elsewhere,
     // typically where workmanager is initially configured or from UI.
+  }
+
+  Future<void> setColorSeedValue(int? colorSeedValue) async {
+    final prefs = getUserPreferences();
+    prefs.colorSeedValue = colorSeedValue;
+    await saveUserPreferences(prefs);
   }
 
   // Optional: A method to get the box if direct access is needed elsewhere

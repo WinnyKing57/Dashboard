@@ -61,15 +61,15 @@ void main() async {
   );
 
   // Charge les préférences utilisateur
-  final preferencesService = PreferencesService();
-  final userPreferences = await preferencesService.getUserPreferences();
+  // final preferencesService = PreferencesService(); // No longer needed here
+  // final userPreferences = await preferencesService.getUserPreferences(); // No longer needed here
 
-  runApp(MyApp(initialThemeModeName: userPreferences.themeModeName));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  final String initialThemeModeName;
-  const MyApp({super.key, required this.initialThemeModeName});
+  // final String initialThemeModeName; // Removed
+  const MyApp({super.key}); // Removed required this.initialThemeModeName
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -77,11 +77,31 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late ThemeMode _themeMode;
+  late Color _currentColorSeed; // Added state variable for color seed
+  late PreferencesService _preferencesService; // Added PreferencesService instance
 
   @override
   void initState() {
     super.initState();
-    _themeMode = _getThemeModeFromString(widget.initialThemeModeName);
+    _preferencesService = PreferencesService(); // Initialize PreferencesService
+    UserPreferences prefs = _preferencesService.getUserPreferences();
+    _themeMode = _getThemeModeFromString(prefs.themeModeName); // Use loaded themeModeName
+
+    // Initialize _currentColorSeed
+    if (prefs.colorSeedValue != null) {
+      _currentColorSeed = Color(prefs.colorSeedValue!);
+    } else {
+      _currentColorSeed = Colors.blue; // Default seed color
+    }
+  }
+
+  Future<void> _updateColorSeed(Color newColor) async {
+    if (_currentColorSeed != newColor) {
+      setState(() {
+        _currentColorSeed = newColor;
+      });
+      await _preferencesService.setColorSeedValue(newColor.value);
+    }
   }
 
   ThemeMode _getThemeModeFromString(String themeString) {
@@ -105,24 +125,33 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Dashboard App',
+      title: 'WinBoard',
       theme: ThemeData(
-        colorSchemeSeed: Colors.blue,
+        colorSchemeSeed: _currentColorSeed, // Use state variable
         brightness: Brightness.light,
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: Colors.blue,
+        colorSchemeSeed: _currentColorSeed, // Use state variable
         brightness: Brightness.dark,
       ),
       themeMode: _themeMode,
-      home: MainNavigationScreen(onThemeChanged: _updateThemeMode),
+      home: MainNavigationScreen(
+        onThemeChanged: _updateThemeMode,
+        onColorSeedChanged: _updateColorSeed, // Add this line
+      ),
     );
   }
 }
 
 class MainNavigationScreen extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
-  const MainNavigationScreen({super.key, required this.onThemeChanged});
+  final Function(Color) onColorSeedChanged; // Add this line
+
+  const MainNavigationScreen({
+    super.key,
+    required this.onThemeChanged,
+    required this.onColorSeedChanged, // Add this line
+  });
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
@@ -140,7 +169,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const DashboardScreen(),
       const RssFeedScreen(),
       const WebRadioScreen(),
-      SettingsScreen(onThemeChanged: widget.onThemeChanged),
+      SettingsScreen(
+        onThemeChanged: widget.onThemeChanged,
+        onColorSeedChanged: widget.onColorSeedChanged, // Add this line
+      ),
     ];
   }
 
@@ -162,8 +194,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),

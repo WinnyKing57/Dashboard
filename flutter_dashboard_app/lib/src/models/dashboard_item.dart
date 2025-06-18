@@ -14,7 +14,7 @@ class DashboardItem extends HiveObject {
   int order; // To maintain the order of widgets
 
   @HiveField(3)
-  HiveObject? widgetData; // Holds specific data, e.g., NotepadData instance
+  dynamic widgetData; // Holds specific data, e.g., NotepadData instance, or Map<String, dynamic> for JSON configs
 
   DashboardItem({
     required this.id,

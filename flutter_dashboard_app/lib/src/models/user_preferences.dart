@@ -13,10 +13,14 @@ class UserPreferences extends HiveObject { // Extend HiveObject for easier box m
   @HiveField(2)
   int rssRefreshFrequencyHours;
 
+  @HiveField(3)
+  int? colorSeedValue;
+
   UserPreferences({
     required this.themeModeName,
     this.rssNotificationsEnabled = true, // Default to true
     this.rssRefreshFrequencyHours = 6, // Default to 6 hours
+    this.colorSeedValue,
   });
 
   // Default preferences
@@ -25,6 +29,7 @@ class UserPreferences extends HiveObject { // Extend HiveObject for easier box m
       themeModeName: 'system',
       rssNotificationsEnabled: true,
       rssRefreshFrequencyHours: 6,
+      colorSeedValue: null, // Default for the new field
     );
   }
 }

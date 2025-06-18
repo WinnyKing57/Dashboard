@@ -10,6 +10,7 @@ import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart';
 import 'package:flutter_dashboard_app/src/services/dashboard_service.dart';
 import 'package:flutter_dashboard_app/src/services/rss_service.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
+import '../widget_factory.dart'; // Adjusted path
 
 class DashboardScreen extends StatefulWidget {
   final DashboardService? _dashboardServiceForTest;
@@ -129,6 +130,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadDashboardItems();
   }
 
+  Future<void> _addDynamicLabelWidget() async {
+    // Example configuration for a new label widget
+    final Map<String, dynamic> labelConfig = {
+      "text": "Hello from Dynamic Label!",
+      "textColor": "#FF00FF" // Magenta color
+    };
+    // We'll call a new DashboardService method here in a later step.
+    // For now, let's assume it will be:
+    // await _dashboardService.createAndSaveDynamicWidgetItem(_dashboardItems.length, "label", labelConfig);
+    // For this subtask, we'll just log it and call _loadDashboardItems to simulate.
+    print("Attempting to add dynamic label with config: $labelConfig");
+    // The actual saving logic will be in the DashboardService modification step.
+    await _dashboardService.createAndSaveDynamicWidgetItem(
+        _dashboardItems.length, "label", labelConfig);
+    _loadDashboardItems(); // Reload to see changes
+  }
+
   Future<void> _deleteDashboardItem(String id) async {
     await _dashboardService.deleteDashboardItem(id);
     _loadDashboardItems();
@@ -145,6 +163,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildWidgetItem(DashboardItem item, BuildContext context) {
     Widget content;
     switch (item.widgetType) {
+      case 'label':
+        if (item.widgetData is Map<String, dynamic>) {
+          // Construct the JSON object expected by buildWidgetFromJson
+          final widgetJson = {
+            "widget_id": item.id, // Pass the item's ID
+            "type": "label",
+            "config": item.widgetData as Map<String, dynamic>,
+          };
+          content = buildWidgetFromJson(widgetJson);
+        } else {
+          content = const Text('Error: Label widgetData is not a valid config map');
+        }
+        break;
       case 'notepad':
         content = NotepadWidget(
           notepadData: item.widgetData as NotepadData,
@@ -199,12 +230,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (value == 'add_placeholder') _addPlaceholder();
               if (value == 'add_rss_summary') _addRssSummaryWidget();
               if (value == 'add_webradio_status') _addWebRadioStatusWidget();
+              if (value == 'add_dynamic_label') _addDynamicLabelWidget();
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(value: 'add_notepad', child: Text('Add Notepad')),
               const PopupMenuItem<String>(value: 'add_placeholder', child: Text('Add Placeholder')),
               const PopupMenuItem<String>(value: 'add_rss_summary', child: Text('Add RSS Summary')),
               const PopupMenuItem<String>(value: 'add_webradio_status', child: Text('Add WebRadio Status')),
+              const PopupMenuItem<String>(value: 'add_dynamic_label', child: Text('Add Dynamic Label')),
             ],
             icon: const Icon(Icons.add),
           ),

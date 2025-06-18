@@ -20,19 +20,22 @@ class UserPreferencesAdapter extends TypeAdapter<UserPreferences> {
       themeModeName: fields[0] as String,
       rssNotificationsEnabled: fields[1] as bool,
       rssRefreshFrequencyHours: fields[2] as int,
+      colorSeedValue: fields[3] as int?, // Add this line
     );
   }
 
   @override
   void write(BinaryWriter writer, UserPreferences obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4) // Incremented number of fields
       ..writeByte(0)
       ..write(obj.themeModeName)
       ..writeByte(1)
       ..write(obj.rssNotificationsEnabled)
       ..writeByte(2)
-      ..write(obj.rssRefreshFrequencyHours);
+      ..write(obj.rssRefreshFrequencyHours)
+      ..writeByte(3) // Add this line for the new field index
+      ..write(obj.colorSeedValue); // Add this line to write the new field's value
   }
 
   @override
