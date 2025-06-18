@@ -80,7 +80,7 @@ jobs:
 #        timeout-minutes: 30
 
       - name: Upload APK Artifact (Debug)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: app-debug.apk
           path: flutter_dashboard_app/build/app/outputs/flutter-apk/app-debug.apk
