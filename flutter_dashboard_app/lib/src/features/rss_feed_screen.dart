@@ -35,7 +35,19 @@ class _RssFeedScreenState extends State<RssFeedScreen> {
     });
   }
 
-  Future<void> _addFeedSourceDialog() async {
+  Future<void> callRefreshAllFeeds() async {
+    if (!mounted) return;
+    setState(() { _isLoading = true; });
+    await _rssService.refreshAllFeeds();
+    _loadFeedSources();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All feeds refreshed.')),
+      );
+    }
+  }
+
+  Future<void> callAddFeedSourceDialog() async {
     final TextEditingController urlController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
@@ -151,19 +163,6 @@ class _RssFeedScreenState extends State<RssFeedScreen> {
                 },
               );
 
-    return Stack(
-      children: [
-        bodyContent,
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: FloatingActionButton(
-            onPressed: _addFeedSourceDialog,
-            tooltip: 'Add Feed Source',
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
-    );
+    return bodyContent; // Return bodyContent directly
   }
 }

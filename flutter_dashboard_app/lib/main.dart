@@ -157,29 +157,95 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
+class ScreenConfig {
+  final String title;
+  final Widget screenWidget;
+  final List<Widget> appBarActions; // List of actions for the AppBar
+
+  ScreenConfig({
+    required this.title,
+    required this.screenWidget,
+    this.appBarActions = const [], // Default to no actions
+  });
+}
+
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
+  final GlobalKey<_DashboardScreenState> _dashboardScreenKey = GlobalKey<_DashboardScreenState>();
+  final GlobalKey<_RssFeedScreenState> _rssFeedScreenKey = GlobalKey<_RssFeedScreenState>(); // Added GlobalKey for RSS
 
-  late final List<Widget> _widgetOptions;
-  late final List<String> _screenTitles; // Added screen titles
+  late final List<ScreenConfig> _screenConfigurations; // New configuration list
 
   @override
   void initState() {
     super.initState();
-    _widgetOptions = <Widget>[
-      const DashboardScreen(),
-      const RssFeedScreen(),
-      const WebRadioScreen(),
-      SettingsScreen(
-        onThemeChanged: widget.onThemeChanged,
-        onColorSeedChanged: widget.onColorSeedChanged,
+    _screenConfigurations = <ScreenConfig>[
+      ScreenConfig(
+        title: 'Dashboard',
+        screenWidget: DashboardScreen(key: _dashboardScreenKey), // Pass the key
+        appBarActions: <Widget>[
+          Builder(
+            builder: (context) => PopupMenuButton<String>(
+              icon: const Icon(Icons.add),
+              onSelected: (value) {
+                if (value == 'add_dynamic_label') {
+                  _dashboardScreenKey.currentState?.callAddDynamicLabelWidget();
+                } else if (value == 'add_notepad') {
+                  _dashboardScreenKey.currentState?.callAddNotepadWidget();
+                } else if (value == 'add_placeholder') {
+                  _dashboardScreenKey.currentState?.callAddPlaceholder();
+                } else if (value == 'add_rss_summary') {
+                  _dashboardScreenKey.currentState?.callAddRssSummaryWidget();
+                } else if (value == 'add_webradio_status') {
+                  _dashboardScreenKey.currentState?.callAddWebRadioStatusWidget();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(value: 'add_dynamic_label', child: Text('Add Dynamic Label')),
+                const PopupMenuItem<String>(value: 'add_notepad', child: Text('Add Notepad')),
+                const PopupMenuItem<String>(value: 'add_placeholder', child: Text('Add Placeholder')),
+                const PopupMenuItem<String>(value: 'add_rss_summary', child: Text('Add RSS Summary')),
+                const PopupMenuItem<String>(value: 'add_webradio_status', child: Text('Add WebRadio Status')),
+              ],
+            ),
+          ),
+        ],
       ),
-    ];
-    _screenTitles = <String>[ // Initialize titles
-      'Dashboard',
-      'RSS Feeds',
-      'Web Radio',
-      'Settings',
+      ScreenConfig(
+        title: 'RSS Feeds',
+        screenWidget: RssFeedScreen(key: _rssFeedScreenKey), // Pass the key
+        appBarActions: <Widget>[
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              tooltip: 'Add Feed Source',
+              onPressed: () {
+                _rssFeedScreenKey.currentState?.callAddFeedSourceDialog();
+              },
+            ),
+          ),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh All Feeds',
+              onPressed: () {
+                _rssFeedScreenKey.currentState?.callRefreshAllFeeds();
+              },
+            ),
+          ),
+        ],
+      ),
+      ScreenConfig(
+        title: 'Web Radio',
+        screenWidget: const WebRadioScreen(),
+      ),
+      ScreenConfig(
+        title: 'Settings',
+        screenWidget: SettingsScreen(
+          onThemeChanged: widget.onThemeChanged,
+          onColorSeedChanged: widget.onColorSeedChanged,
+        ),
+      ),
     ];
   }
 
@@ -193,10 +259,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( // Added AppBar
-        title: Text(_screenTitles[_selectedIndex]),
+      appBar: AppBar(
+        title: Text(_screenConfigurations[_selectedIndex].title), // Use title from config
+        actions: _screenConfigurations[_selectedIndex].appBarActions, // Use actions from config
       ),
-      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
+      body: Center(child: _screenConfigurations[_selectedIndex].screenWidget), // Use widget from config
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -215,25 +282,25 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.dashboard),
-              title: const Text('Dashboard'),
+              title: Text(_screenConfigurations[0].title), // Use title from config
               selected: _selectedIndex == 0,
               onTap: () => _onItemTapped(0),
             ),
             ListTile(
               leading: const Icon(Icons.rss_feed),
-              title: const Text('RSS'),
+              title: Text(_screenConfigurations[1].title), // Use title from config
               selected: _selectedIndex == 1,
               onTap: () => _onItemTapped(1),
             ),
             ListTile(
               leading: const Icon(Icons.radio),
-              title: const Text('Web Radio'),
+              title: Text(_screenConfigurations[2].title), // Use title from config
               selected: _selectedIndex == 2,
               onTap: () => _onItemTapped(2),
             ),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              title: Text(_screenConfigurations[3].title), // Use title from config
               selected: _selectedIndex == 3,
               onTap: () => _onItemTapped(3),
             ),

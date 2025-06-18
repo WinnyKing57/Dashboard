@@ -70,17 +70,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     await _dashboardService.createAndSaveWebRadioStatusItem(currentOrder++);
   }
 
-  Future<void> _addNotepadWidget() async {
+  Future<void> callAddNotepadWidget() async {
     await _dashboardService.createAndSaveNotepadItem(_dashboardItems.length);
     _loadDashboardItems();
   }
 
-  Future<void> _addPlaceholder() async {
+  Future<void> callAddPlaceholder() async {
     await _dashboardService.createAndSavePlaceholderItem(_dashboardItems.length);
     _loadDashboardItems();
   }
 
-  Future<void> _addRssSummaryWidget() async {
+  Future<void> callAddRssSummaryWidget() async {
     List<RssFeedSource> sources = _rssService.getFeedSources();
     if (sources.isEmpty) {
       if (mounted) {
@@ -125,12 +125,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _addWebRadioStatusWidget() async {
+  Future<void> callAddWebRadioStatusWidget() async {
     await _dashboardService.createAndSaveWebRadioStatusItem(_dashboardItems.length);
     _loadDashboardItems();
   }
 
-  Future<void> _addDynamicLabelWidget() async {
+  Future<void> callAddDynamicLabelWidget() async {
     // Example configuration for a new label widget
     final Map<String, dynamic> labelConfig = {
       "text": "Hello from Dynamic Label!",
