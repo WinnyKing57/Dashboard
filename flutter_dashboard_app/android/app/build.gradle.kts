@@ -33,7 +33,7 @@ android {
 
     // Keystore properties loading logic
     val keystorePropertiesFile = rootProject.file("keystore.properties")
-    val keystoreProperties = _root_.java.util.Properties()
+    val keystoreProperties = java.util.Properties()
     if (keystorePropertiesFile.exists()) {
         keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
     }
@@ -42,7 +42,7 @@ android {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
             keyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-            val storeFileFromProps = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it) }
+            val storeFileFromProps = keystoreProperties.getProperty("storeFile")?.let { rootProject.file(it as String) }
             val storeFileFromEnv = System.getenv("STORE_FILE")?.let { rootProject.file(it) }
             storeFile = storeFileFromProps ?: storeFileFromEnv
             storePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
