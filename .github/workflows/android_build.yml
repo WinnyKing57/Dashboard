@@ -30,9 +30,32 @@ jobs:
         working-directory: ./flutter_dashboard_app
         run: flutter pub get
 
+      - name: Create keystore.properties
+        if: |
+          secrets.RELEASE_STORE_PASSWORD != null &&
+          secrets.RELEASE_KEY_ALIAS != null &&
+          secrets.RELEASE_KEY_PASSWORD != null &&
+          secrets.RELEASE_STORE_FILE_BASE64 != null
+        working-directory: ./flutter_dashboard_app/android/app
+        run: |
+          echo "storeFile=my-release-key.keystore" > keystore.properties
+          echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
+          echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
+
+      - name: Decode Keystore
+        if: |
+          secrets.RELEASE_STORE_PASSWORD != null &&
+          secrets.RELEASE_KEY_ALIAS != null &&
+          secrets.RELEASE_KEY_PASSWORD != null &&
+          secrets.RELEASE_STORE_FILE_BASE64 != null
+        working-directory: ./flutter_dashboard_app/android/app
+        run: echo "${{ secrets.RELEASE_STORE_FILE_BASE64 }}" | base64 --decode > my-release-key.keystore
+
       - name: Build APK (release)
         working-directory: ./flutter_dashboard_app
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
+        timeout-minutes: 30
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
