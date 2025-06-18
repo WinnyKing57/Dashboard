@@ -77,7 +77,7 @@ jobs:
       - name: Build Android APK (Release)
         working-directory: ./flutter_dashboard_app
         run: flutter build apk --release --verbose
-#        timeout-minutes: 30
+        timeout-minutes: 30
 
       - name: Upload APK Artifact (Release)
         uses: actions/upload-artifact@v4
