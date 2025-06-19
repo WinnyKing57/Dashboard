@@ -31,27 +31,8 @@ android {
         multiDexEnabled = true
     }
 
-    // Chargement des propriétés de signature
-    val keystorePropertiesFile = file("keystore.properties")
-    val keystoreProperties = Properties()
-    if (keystorePropertiesFile.exists()) {
-        keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
-    }
-
-    signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
-            keyPassword = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-            val storeFileFromProps = keystoreProperties.getProperty("storeFile")?.let { file(it) }
-            val storeFileFromEnv = System.getenv("STORE_FILE")?.let { file(it) }
-            storeFile = storeFileFromProps ?: storeFileFromEnv
-            storePassword = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
-        }
-    }
-
     buildTypes {
         release {
-            // signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true // ✅ Correction ici
             // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
