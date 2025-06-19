@@ -24,10 +24,10 @@ class DashboardScreen extends StatefulWidget {
         _rssServiceForTest = rssServiceForTest;
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
   late final DashboardService _dashboardService;
   late final RssService _rssService;
   List<DashboardItem> _dashboardItems = [];

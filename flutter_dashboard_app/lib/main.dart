@@ -171,8 +171,8 @@ class ScreenConfig {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
-  final GlobalKey<_DashboardScreenState> _dashboardScreenKey = GlobalKey<_DashboardScreenState>();
-  final GlobalKey<_RssFeedScreenState> _rssFeedScreenKey = GlobalKey<_RssFeedScreenState>(); // Added GlobalKey for RSS
+  final GlobalKey<DashboardScreenState> _dashboardScreenKey = GlobalKey<DashboardScreenState>();
+  final GlobalKey<RssFeedScreenState> _rssFeedScreenKey = GlobalKey<RssFeedScreenState>(); // Added GlobalKey for RSS
 
   late final List<ScreenConfig> _screenConfigurations; // New configuration list
 

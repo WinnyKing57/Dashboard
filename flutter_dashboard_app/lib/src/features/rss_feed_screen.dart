@@ -11,10 +11,10 @@ class RssFeedScreen extends StatefulWidget {
   const RssFeedScreen({super.key});
 
   @override
-  State<RssFeedScreen> createState() => _RssFeedScreenState();
+  State<RssFeedScreen> createState() => RssFeedScreenState();
 }
 
-class _RssFeedScreenState extends State<RssFeedScreen> {
+class RssFeedScreenState extends State<RssFeedScreen> {
   final RssService _rssService = RssService();
   List<RssFeedSource> _feedSources = [];
   bool _isLoading = false;

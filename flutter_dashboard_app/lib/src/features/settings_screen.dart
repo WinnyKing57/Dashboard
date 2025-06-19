@@ -95,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
                       color: color,
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white30 : Colors.black30,
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white30 : Colors.black38,
                         width: 1.5
                       )
                     ),
@@ -140,7 +140,7 @@ class SettingsScreen extends StatelessWidget {
                 _showColorDialog(context);
               }
             },
-          ),
+          )
           // Add other settings here in the future
         ],
       ),
