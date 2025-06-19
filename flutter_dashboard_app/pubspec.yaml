@@ -46,3 +46,4 @@ flutter:
 
 dependency_overrides:
   xml: ^6.1.0
+  meta: ^1.15.0
