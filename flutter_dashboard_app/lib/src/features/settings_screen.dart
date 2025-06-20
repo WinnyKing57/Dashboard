@@ -129,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
               if (onThemeChanged != null) {
                 _showThemeModeDialog(context);
               }
-            },
+            } // Comma removed after onTap's closing brace
             ), // End of first ListTile
             // Add other settings here in the future
         ],
