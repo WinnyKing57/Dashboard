@@ -116,24 +116,22 @@ class SettingsScreen extends StatelessWidget {
     // This is just for display in the ListTile, MyAppState holds the truth.
     Color currentSeedColorDisplay = Theme.of(context).colorScheme.primary;
 
-    // Removed Scaffold and AppBar. The ListView is returned directly.
     return ListView(
       children: <Widget>[
         ListTile(
           leading: const Icon(Icons.brightness_6),
-            title: const Text('Theme Mode'),
-            // Subtitle could show current theme, e.g., "Light", "Dark", "System"
-            // This would require getting the actual current ThemeMode from MyAppState
-            subtitle: Text(Theme.of(context).brightness == Brightness.dark ? "Dark" : "Light"), // Simplified
-            onTap: () {
-              if (onThemeChanged != null) {
-                _showThemeModeDialog(context);
-              }
-            } // Comma removed after onTap's closing brace
-            ), // End of first ListTile
-            // Add other settings here in the future
-        ],
-      ),
+          title: const Text('Theme Mode'),
+          subtitle: Text(
+            Theme.of(context).brightness == Brightness.dark ? "Dark" : "Light"
+          ),
+          onTap: () {
+            if (onThemeChanged != null) {
+              _showThemeModeDialog(context);
+            }
+          },
+        ), // Trailing comma for ListTile in children list
+        // Add other settings here in the future
+      ],
     );
   }
 }
