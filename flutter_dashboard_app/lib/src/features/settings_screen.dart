@@ -130,21 +130,8 @@ class SettingsScreen extends StatelessWidget {
                 _showThemeModeDialog(context);
               }
             },
-          ) // End of first ListTile
-
-        /* Temporarily commented out:
-        ListTile(
-          leading: Icon(Icons.color_lens, color: currentSeedColorDisplay),
-          title: const Text('App Color'),
-          subtitle: const Text('Select the primary color for the app theme'),
-          onTap: () {
-            if (onColorSeedChanged != null) {
-              _showColorDialog(context);
-            }
-          },
-        )
-        */
-          // Add other settings here in the future
+            ) // End of first ListTile
+            // Add other settings here in the future
         ],
       ),
     );
