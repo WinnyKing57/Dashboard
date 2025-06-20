@@ -130,7 +130,7 @@ class SettingsScreen extends StatelessWidget {
                 _showThemeModeDialog(context);
               }
             },
-            ) // End of first ListTile
+            ), // End of first ListTile
             // Add other settings here in the future
         ],
       ),
