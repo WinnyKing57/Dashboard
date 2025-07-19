@@ -22,6 +22,22 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
+    signingConfigs {
+        create("release") {
+            // Initialisation de key.properties
+            val keyProperties =
+                rootProject.file("key.properties").takeIf { it.exists() }?.let {
+                    Properties().apply { load(it.inputStream()) }
+                }
+
+            keyAlias = keyProperties?.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+            keyPassword = keyProperties?.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
+            storeFile = file(keyProperties?.getProperty("storeFile") ?: System.getenv("STORE_FILE"))
+            storePassword =
+                keyProperties?.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.winnyking.winboard"
         minSdk = flutter.minSdkVersion
@@ -37,6 +53,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
