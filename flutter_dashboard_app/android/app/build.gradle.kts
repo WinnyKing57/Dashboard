@@ -22,14 +22,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("keystore.jks")
-            storePassword = "password"
-            keyAlias = "alias"
-            keyPassword = "password"
-        }
-    }
 
     defaultConfig {
         applicationId = "com.winnyking.winboard"
@@ -46,7 +38,6 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
