@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.winnyking.winboard"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 33
     ndkVersion = "26.1.10909125"
 
     compileOptions {
@@ -25,8 +25,8 @@ android {
 
     defaultConfig {
         applicationId = "com.winnyking.winboard"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0.0"
         multiDexEnabled = true
