@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.winnyking.winboard"
-    compileSdk = 33
+    compileSdk = 34
     ndkVersion = "26.1.10909125"
 
     compileOptions {
@@ -26,7 +26,7 @@ android {
     defaultConfig {
         applicationId = "com.winnyking.winboard"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
         multiDexEnabled = true
