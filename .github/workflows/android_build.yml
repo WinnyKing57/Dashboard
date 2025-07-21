@@ -29,6 +29,9 @@ jobs:
       - name: Get Flutter dependencies
         working-directory: ./flutter_dashboard_app
         run: flutter pub get
+      - name: Run pub get
+        run: flutter pub get
+        working-directory: ./flutter_dashboard_app
 
       - name: Decode Keystore
         working-directory: ./flutter_dashboard_app/android/app

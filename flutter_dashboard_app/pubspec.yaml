@@ -17,7 +17,10 @@ dependencies:
   hive_flutter: ^1.1.0
   uuid: ^4.4.0
   http: ^1.2.1
-  webfeed: ^0.6.0
+  webfeed_plus:
+    git:
+      url: https://github.com/OmkarDabade/webfeed_plus.git
+      ref: master
   flutter_slidable: ^3.1.0
   url_launcher: ^6.3.0
   just_audio: ^0.9.36

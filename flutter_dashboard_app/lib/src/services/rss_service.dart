@@ -2,7 +2,7 @@ import 'package:flutter_dashboard_app/src/models/rss_feed_item.dart';
 import 'package:flutter_dashboard_app/src/models/rss_feed_source.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:webfeed/webfeed.dart';
+import 'package:webfeed_plus/webfeed_plus.dart';
 import 'package:uuid/uuid.dart';
 
 class RssService {
