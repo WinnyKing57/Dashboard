@@ -26,11 +26,6 @@ jobs:
       - name: Flutter version check
         run: flutter --version
 
-      - name: Debugging Step
-        run: |
-          echo "PATH: $PATH"
-          echo "Listing /opt/hostedtoolcache:"
-          ls -l /opt/hostedtoolcache
       - name: Get Flutter dependencies
         working-directory: ./flutter_dashboard_app
         run: flutter pub get
